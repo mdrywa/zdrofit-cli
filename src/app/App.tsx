@@ -1,13 +1,20 @@
 import React, {useState} from "react";
-import {Box, useApp} from "ink";
+import {Box, useApp, useInput} from "ink";
 import type {AppScreen} from "./app.types.ts";
 import {MainMenuScreen} from "./screens/MainMenuScreen.tsx";
 
 
-export function App(): React.ReactElement {
+export function App(){
+    // Exit app function
     const {exit} = useApp();
-
+    // Current screen
     const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
+
+    useInput((input) => {
+        if (input.toLowerCase() === "q") {
+            exit();
+        }
+    });
 
     function navigateTo(screen: AppScreen): void {
         setCurrentScreen(screen);
