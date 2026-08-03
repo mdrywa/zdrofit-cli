@@ -1,7 +1,8 @@
 import React, {useState} from "react";
-import {Box, useApp, useInput} from "ink";
+import {Box, useApp} from "ink";
 import type {AppScreen} from "./app.types.ts";
 import {MainMenuScreen} from "./screens/MainMenuScreen.tsx";
+import {AccountsScreen} from "../features/account/screens/AccountsScreen.tsx";
 
 
 export function App(){
@@ -9,12 +10,6 @@ export function App(){
     const {exit} = useApp();
     // Current screen
     const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
-
-    useInput((input) => {
-        if (input.toLowerCase() === "q") {
-            exit();
-        }
-    });
 
     function navigateTo(screen: AppScreen): void {
         setCurrentScreen(screen);
@@ -24,7 +19,18 @@ export function App(){
         switch (currentScreen) {
             case "main-menu":
             return (
-                <MainMenuScreen/>
+                <MainMenuScreen
+                    onAccountClick={() => navigateTo("accounts")}
+                    onExit={exit}
+                />
+            )
+            case "accounts":
+            return (
+                <AccountsScreen
+                    activeAccount="Test - test@example.com"
+                    sessionActive="Aktywna"
+                    returnClick={() => navigateTo("main-menu")}
+                />
             )
         }
     }
