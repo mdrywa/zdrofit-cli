@@ -6,7 +6,7 @@ export function AccountsScreen() {
 
 
     return (
-        <Box>
+        <Box flexDirection={"column"}>
 
         </Box>
     )

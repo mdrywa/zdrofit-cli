@@ -5,6 +5,7 @@ import {colors} from "../../theme/colors.ts";
 import {NavigationHints} from "../../shared/components/NavigationHints.tsx";
 import {Divider} from "../../shared/components/Divider.tsx";
 import {SelectionList} from "../../shared/components/SelectionList.tsx";
+import {SettingRow} from "../../shared/components/SettingRow.tsx";
 
 
 export function MainMenuScreen(): React.ReactElement {
@@ -15,27 +16,24 @@ export function MainMenuScreen(): React.ReactElement {
             <Logo/>
 
             <Box flexDirection="column" marginTop={1} borderStyle="round" borderColor={colors.border.active}>
-                <Box flexDirection="row" justifyContent="space-between">
-                    <Box>
-                        <Text color={colors.text.muted}>Konto: </Text>
-                        <Text color={colors.text.primary}>Test - test@example.com</Text>
-                    </Box>
-                    <Text color={colors.text.muted}>[A] zmień</Text>
-                </Box>
-                <Box flexDirection="row" justifyContent="space-between">
-                    <Box>
-                        <Text color={colors.text.muted}>Klub: </Text>
-                        <Text color={colors.text.primary}>Zdrofit Klub Nieborowska 10 Gdańsk</Text>
-                    </Box>
-                    <Text color={colors.text.muted}>[C] zmień</Text>
-                </Box>
-                <Box flexDirection="row" justifyContent="space-between">
-                    <Box>
-                        <Text color={colors.text.muted}>Sesja: </Text>
-                        <Text color={colors.text.primary}>Aktywna</Text>
-                    </Box>
-                    <Text color={colors.text.muted}>[R] odświerz</Text>
-                </Box>
+                <SettingRow
+                    label={"Konto"}
+                    value={"Test - test@example.com"}
+                    shortcut={"A"}
+                    actionLabel={"zmień"}
+                />
+                <SettingRow
+                    label={"Klub"}
+                    value={"Zdrofit Klub Nieborowska 10 Gdańsk"}
+                    shortcut={"C"}
+                    actionLabel={"zmień"}
+                />
+                <SettingRow
+                    label={"Sesja"}
+                    value={"Aktywna"}
+                    shortcut={"R"}
+                    actionLabel={"odśwież"}
+                />
             </Box>
 
 
