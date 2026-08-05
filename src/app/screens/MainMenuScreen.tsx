@@ -8,11 +8,12 @@ import {SelectionList} from "../../shared/components/SelectionList.tsx";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
 
 type MainMenuScreenProps = {
+    activeAccount: string;
     onAccountClick: () => void;
     onExit: () => void;
 }
 
-export function MainMenuScreen({onAccountClick, onExit}: MainMenuScreenProps): React.ReactElement {
+export function MainMenuScreen({activeAccount, onAccountClick, onExit}: MainMenuScreenProps): React.ReactElement {
     useInput((input) => {
         if (input.toLowerCase() === "a") {
             onAccountClick();
@@ -30,7 +31,7 @@ export function MainMenuScreen({onAccountClick, onExit}: MainMenuScreenProps): R
             <Box flexDirection="column" marginTop={1} paddingX={1} borderStyle="round" borderColor={colors.border.active}>
                 <SettingRow
                     label={"Konto"}
-                    value={"Test - test@example.com"}
+                    value={activeAccount}
                     shortcut={"A"}
                     actionLabel={"zmień"}
                 />

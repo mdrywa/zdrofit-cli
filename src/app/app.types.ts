@@ -1,3 +1,4 @@
 export type AppScreen =
     "main-menu" |
-    "accounts"
+    "accounts" |
+    "new-account"

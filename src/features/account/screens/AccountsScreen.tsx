@@ -6,15 +6,22 @@ import {Divider} from "../../../shared/components/Divider.tsx";
 import {NavigationHints} from "../../../shared/components/NavigationHints.tsx";
 import {SelectionList} from "../../../shared/components/SelectionList.tsx";
 import {ScreenLogo} from "../../../shared/components/ScreenLogo.tsx";
+import type {AccountScreenProps} from "../account.types.ts";
 
 
-type AccountScreenProps = {
-    activeAccount: string;
-    sessionActive: string;
-    returnClick: () => void;
-}
 
-export function AccountsScreen({activeAccount, sessionActive, returnClick}: AccountScreenProps) {
+
+export function AccountsScreen({
+    accounts,
+    isLoading,
+    error,
+    activeAccount,
+    sessionActive,
+    returnClick,
+    newAccountClick,
+    accountChangeClick,
+    deleteAccountClick
+}: AccountScreenProps) {
 
     useInput((_input, key)=>{
         if (key.escape){
@@ -38,31 +45,38 @@ export function AccountsScreen({activeAccount, sessionActive, returnClick}: Acco
                 <SettingRow label={"Sesja"} value={sessionActive} />
             </Box>
 
-            <SelectionList
-                items={[
-                    {
-                        id: "konto1",
-                        label: "Konto numer 1",
-                        onSelect: () => console.log("konto 1"),
-                    },
-                    {
-                        id: "konto2",
-                        label: "Konto numer 2",
-                        onSelect: () => console.log("konto 2"),
-                    },
-                    {
-                        id: "konto3",
-                        label: "Konto numer 3",
-                        onSelect: () => console.log("konto 3"),
-                    },
-                ]}
-            />
+            {isLoading ? <Text color={colors.text.secondary}>Ładowanie kont...</Text> : null}
+
+            {error ? <Text color={colors.status.error}>{error}</Text> : null}
+
+            {!isLoading ? (
+                <SelectionList
+                    items={[
+                        {
+                            id: "new-account",
+                            label: "+ Dodaj nowe konto",
+                            onSelect: newAccountClick,
+                        },
+                        ...accounts.map(account => ({
+                            id: account.id,
+                            label: `${account.name} - ${account.email}${account.isActive ? " (aktywne)" : ""}`,
+                            onSelect: () => {
+                                void accountChangeClick(account.id).catch(() => undefined);
+                            },
+                            onDelete: () => {
+                                void deleteAccountClick(account.id).catch(() => undefined);
+                            }
+                        }))
+                    ]}
+                />
+            ) : null}
 
             <Divider/>
             <NavigationHints
                 hints={[
                     {key: "↑↓", label: "wybierz"},
                     {key: "Enter", label: "zatwierdź"},
+                    {key: "Delete", label: "usuń"},
                     {key: "ESC", label: "cofnij"},
                 ]}
             />

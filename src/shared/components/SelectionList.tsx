@@ -6,6 +6,7 @@ export type SelectionListItem = {
     id: string;
     label: string;
     onSelect: () => void;
+    onDelete?: () => void;
 }
 
 type SelectionListProps = {
@@ -26,6 +27,10 @@ export function SelectionList({items}: SelectionListProps) {
 
         if (key.downArrow) {
             setSelectedIndex((currentIndex) => currentIndex === items.length - 1 ? 0 : currentIndex + 1);
+        }
+
+        if (key.delete || key.backspace) {
+            items[selectedIndex]?.onDelete && items[selectedIndex].onDelete();
         }
 
         if (key.return) {
