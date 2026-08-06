@@ -6,9 +6,20 @@ import {Divider} from "../../../shared/components/Divider.tsx";
 import {NavigationHints} from "../../../shared/components/NavigationHints.tsx";
 import {SelectionList} from "../../../shared/components/SelectionList.tsx";
 import {ScreenLogo} from "../../../shared/components/ScreenLogo.tsx";
-import type {AccountScreenProps} from "../account.types.ts";
+import type {Account} from "../account.types.ts";
 
 
+export type AccountScreenProps = {
+    accounts: Account[];
+    isLoading: boolean;
+    error: string | null;
+    activeAccount: string;
+    sessionActive: string;
+    returnClick: () => void;
+    newAccountClick: () => void;
+    accountChangeClick: (accountId: string) => Promise<void>;
+    deleteAccountClick: (accountId: string) => Promise<void>;
+}
 
 
 export function AccountsScreen({

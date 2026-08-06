@@ -1,18 +1,25 @@
 import React from "react";
-import {Box, useInput} from "ink";
+import {Box, Text, useInput} from "ink";
 import {ScreenLogo} from "../../../shared/components/ScreenLogo.tsx";
 import {SettingRow} from "../../../shared/components/SettingRow.tsx";
 import {colors} from "../../../theme/colors.ts";
 import {Divider} from "../../../shared/components/Divider.tsx";
 import {NavigationHints} from "../../../shared/components/NavigationHints.tsx";
-import type {NewAccountScreenProps} from "../account.types.ts";
+import type {CreateAccountInput} from "../account.types.ts";
 import {RegisterForm} from "../components/RegisterForm.tsx";
 
-
+type NewAccountScreenProps = {
+    activeAccount: string;
+    sessionActive: string;
+    error: string | null;
+    returnClick: () => void;
+    onSubmit: (input: CreateAccountInput) => Promise<void>;
+}
 
 export function NewAccountScreen({
     activeAccount,
     sessionActive,
+    error,
     returnClick,
     onSubmit
 }: NewAccountScreenProps) {
@@ -23,6 +30,15 @@ export function NewAccountScreen({
             returnClick();
         }
     });
+
+    async function handleSubmit(input: CreateAccountInput): Promise<void> {
+        try {
+            await onSubmit(input);
+        }
+        catch {
+            // useAccount stores the error and it is rendered below.
+        }
+    }
 
     return (
         <Box flexDirection={"column"}>
@@ -40,7 +56,9 @@ export function NewAccountScreen({
                 <SettingRow label={"Sesja"} value={sessionActive} />
             </Box>
 
-            <RegisterForm onSubmit={onSubmit}/>
+            {error ? <Text color={colors.status.error}>{error}</Text> : null}
+
+            <RegisterForm onSubmit={handleSubmit}/>
 
             <Divider/>
             <NavigationHints

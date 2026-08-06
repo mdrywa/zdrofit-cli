@@ -1,16 +1,20 @@
 import {useEffect, useState} from "react";
 import type {Account, CreateAccountInput} from "../account.types.ts";
-import {getAccounts} from "../account.repository.ts";
+import {getAccounts} from "../repository/account.repository.ts";
 import {
     createAccount,
     deleteAccount as deleteAccountService,
     switchAccount as switchAccountService,
 } from "../services/account.service.ts";
+import {checkSession, login} from "../services/auth.service.ts";
 
 
 export function useAccount() {
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isCheckingSession, setIsCheckingSession] = useState(true);
+    const [isRefreshingSession, setIsRefreshingSession] = useState(false);
+    const [isSessionActive, setIsSessionActive] = useState<boolean | null>(null);
     const [error, setError] = useState<string | null>(null);
     const activeAccount = accounts.find(account => account.isActive);
 
@@ -20,12 +24,25 @@ export function useAccount() {
                 const savedAccounts = await getAccounts();
 
                 setAccounts(savedAccounts);
+
+                const savedActiveAccount = savedAccounts.find(
+                    account => account.isActive,
+                );
+
+                if (!savedActiveAccount) {
+                    setIsSessionActive(false);
+                    return;
+                }
+
+                setIsSessionActive(await checkSession(savedActiveAccount));
             }
             catch (error: unknown) {
                 setError(getErrorMessage(error));
+                setIsSessionActive(false);
             }
             finally {
                 setIsLoading(false);
+                setIsCheckingSession(false);
             }
         }
 
@@ -68,17 +85,62 @@ export function useAccount() {
 
     async function switchAccount(accountId: string): Promise<void> {
         setError(null);
+        setIsCheckingSession(true);
+        setIsSessionActive(null);
 
         try {
             await switchAccountService(accountId);
 
             const savedAccounts = await getAccounts();
+            const switchedAccount = savedAccounts.find(
+                account => account.id === accountId,
+            );
 
             setAccounts(savedAccounts);
+
+            if (!switchedAccount) {
+                throw new Error("Account does not exist");
+            }
+
+            setIsSessionActive(await checkSession(switchedAccount));
         }
         catch (error: unknown) {
             setError(getErrorMessage(error));
+            setIsSessionActive(false);
             throw error;
+        }
+        finally {
+            setIsCheckingSession(false);
+        }
+    }
+
+    async function refreshSession(): Promise<boolean> {
+        if (isRefreshingSession) {
+            return false;
+        }
+
+        setError(null);
+        setIsRefreshingSession(true);
+
+        if (!activeAccount) {
+            setError("No active account found");
+            setIsRefreshingSession(false);
+            return false;
+        }
+
+        try {
+            await login(activeAccount);
+            setIsSessionActive(true);
+
+            return true;
+        }
+        catch (error: unknown) {
+            setError(getErrorMessage(error));
+            setIsSessionActive(false);
+            return false;
+        }
+        finally {
+            setIsRefreshingSession(false);
         }
     }
 
@@ -86,10 +148,14 @@ export function useAccount() {
         accounts,
         activeAccount,
         isLoading,
+        isCheckingSession,
+        isRefreshingSession,
+        isSessionActive,
         error,
         addAccount,
         deleteAccount,
         switchAccount,
+        refreshSession,
     };
 }
 

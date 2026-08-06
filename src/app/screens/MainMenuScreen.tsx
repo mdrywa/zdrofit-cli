@@ -1,5 +1,5 @@
 import React from "react";
-import {Box, useInput} from "ink";
+import {Box, Text, useInput} from "ink";
 import {Logo} from "../../shared/components/Logo.tsx";
 import {colors} from "../../theme/colors.ts";
 import {NavigationHints} from "../../shared/components/NavigationHints.tsx";
@@ -9,14 +9,28 @@ import {SettingRow} from "../../shared/components/SettingRow.tsx";
 
 type MainMenuScreenProps = {
     activeAccount: string;
+    sessionActive: string;
+    sessionError: string | null;
     onAccountClick: () => void;
+    onSessionRefresh: () => Promise<boolean>;
     onExit: () => void;
 }
 
-export function MainMenuScreen({activeAccount, onAccountClick, onExit}: MainMenuScreenProps): React.ReactElement {
+export function MainMenuScreen({
+    activeAccount,
+    sessionActive,
+    sessionError,
+    onAccountClick,
+    onSessionRefresh,
+    onExit,
+}: MainMenuScreenProps): React.ReactElement {
     useInput((input) => {
         if (input.toLowerCase() === "a") {
             onAccountClick();
+        }
+
+        if (input.toLowerCase() === "r") {
+            void onSessionRefresh();
         }
 
         if (input.toLowerCase() === "q") {
@@ -43,11 +57,16 @@ export function MainMenuScreen({activeAccount, onAccountClick, onExit}: MainMenu
                 />
                 <SettingRow
                     label={"Sesja"}
-                    value={"Aktywna"}
+                    value={sessionActive}
                     shortcut={"R"}
                     actionLabel={"odśwież"}
                 />
             </Box>
+
+            {sessionError ? (
+                <Text color={colors.status.error}>{sessionError}</Text>
+            ) : null}
+
 
 
             <SelectionList
@@ -78,6 +97,7 @@ export function MainMenuScreen({activeAccount, onAccountClick, onExit}: MainMenu
                     {key: "Enter", label: "otwórz"},
                     {key: "A", label: "konto"},
                     {key: "C", label: "klub"},
+                    {key: "R", label: "odśwież sesję"},
                     {key: "Q", label: "wyjdź"},
                 ]}
             />

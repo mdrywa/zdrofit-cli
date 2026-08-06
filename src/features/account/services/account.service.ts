@@ -1,6 +1,6 @@
 import type {Account, CreateAccountInput} from "../account.types.ts";
-import {getAccounts, saveAccounts} from "../account.repository.ts";
-import {deletePassword, savePassword} from "./account-credentials.service.ts";
+import {getAccounts, saveAccounts} from "../repository/account.repository.ts";
+import {deletePassword, deleteSessionId, savePassword} from "./auth.service.ts";
 
 
 export async function createAccount(input: CreateAccountInput): Promise<Account> {
@@ -77,6 +77,7 @@ export async function deleteAccount(accountId: string): Promise<void> {
     }
 
     await deletePassword(accountId);
+    await deleteSessionId(accountId);
     await saveAccounts(remainingAccounts);
 }
 

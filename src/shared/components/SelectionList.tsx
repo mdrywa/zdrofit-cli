@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Box, Text, useInput} from "ink";
 import {colors} from "../../theme/colors.ts";
 
@@ -15,6 +15,16 @@ type SelectionListProps = {
 
 export function SelectionList({items}: SelectionListProps) {
     const [selectedIndex, setSelectedIndex] = useState(0)
+
+    useEffect(() => {
+        setSelectedIndex(currentIndex => {
+            if (items.length === 0) {
+                return 0;
+            }
+
+            return Math.min(currentIndex, items.length - 1);
+        });
+    }, [items.length]);
 
     useInput((_input, key) => {
         if (items.length === 0) {
