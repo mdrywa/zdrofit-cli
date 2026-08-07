@@ -5,11 +5,13 @@ import {AccountsScreen} from "../features/account/screens/AccountsScreen.tsx";
 import {NewAccountScreen} from "../features/account/screens/NewAccountScreen.tsx";
 import {useAccount} from "../features/account/hooks/useAccount.ts";
 import {closeBrowser} from "../infrastructure/playwright/browser.service.ts";
+import {ClubsScreen} from "../features/clubs/screens/ClubsScreen.tsx";
 
 type AppScreen =
     "main-menu" |
     "accounts" |
-    "new-account"
+    "new-account" |
+    "clubs"
 
 export function App(){
     // Exit app function
@@ -71,6 +73,7 @@ export function App(){
                     sessionActive={sessionStatus}
                     sessionError={error}
                     onAccountClick={() => navigateTo("accounts")}
+                    onClubsClick={() => navigateTo("clubs")}
                     onSessionRefresh={refreshSession}
                     onExit={handleExit}
                 />
@@ -97,6 +100,12 @@ export function App(){
                         error={error}
                         returnClick={() => navigateTo("accounts")}
                         onSubmit={handleAddAccount}
+                    />
+                )
+            case "clubs":
+                return (
+                    <ClubsScreen
+                        returnClick={() => navigateTo("main-menu")}
                     />
                 )
         }

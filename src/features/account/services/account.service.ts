@@ -1,9 +1,9 @@
-import type {Account, CreateAccountInput} from "../account.types.ts";
+import type {Account, AccountInput} from "../account.types.ts";
 import {getAccounts, saveAccounts} from "../repository/account.repository.ts";
 import {deletePassword, deleteSessionId, savePassword} from "./auth.service.ts";
 
 
-export async function createAccount(input: CreateAccountInput): Promise<Account> {
+export async function createAccount(input: AccountInput): Promise<Account> {
     const name = input.name.trim();
     const email = input.email.trim().toLowerCase();
 

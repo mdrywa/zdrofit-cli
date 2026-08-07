@@ -5,7 +5,7 @@ import {SettingRow} from "../../../shared/components/SettingRow.tsx";
 import {colors} from "../../../theme/colors.ts";
 import {Divider} from "../../../shared/components/Divider.tsx";
 import {NavigationHints} from "../../../shared/components/NavigationHints.tsx";
-import type {CreateAccountInput} from "../account.types.ts";
+import type {AccountInput} from "../account.types.ts";
 import {RegisterForm} from "../components/RegisterForm.tsx";
 
 type NewAccountScreenProps = {
@@ -13,7 +13,7 @@ type NewAccountScreenProps = {
     sessionActive: string;
     error: string | null;
     returnClick: () => void;
-    onSubmit: (input: CreateAccountInput) => Promise<void>;
+    onSubmit: (input: AccountInput) => Promise<void>;
 }
 
 export function NewAccountScreen({
@@ -31,7 +31,7 @@ export function NewAccountScreen({
         }
     });
 
-    async function handleSubmit(input: CreateAccountInput): Promise<void> {
+    async function handleSubmit(input: AccountInput): Promise<void> {
         try {
             await onSubmit(input);
         }

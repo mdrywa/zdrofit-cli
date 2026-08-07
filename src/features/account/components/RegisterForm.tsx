@@ -2,10 +2,10 @@ import React, {useState} from "react";
 import {Box, Text, useInput} from "ink";
 import TextInput from "ink-text-input";
 import {colors} from "../../../theme/colors.ts";
-import type {CreateAccountInput} from "../account.types.ts";
+import type {AccountInput} from "../account.types.ts";
 
 type RegisterFormProps = {
-    onSubmit: (input: CreateAccountInput) => Promise<unknown>;
+    onSubmit: (input: AccountInput) => Promise<unknown>;
 };
 
 export function RegisterForm({onSubmit}: RegisterFormProps) {

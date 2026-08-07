@@ -7,7 +7,7 @@ export type Account = {
     updatedAt: string;
 }
 
-export type CreateAccountInput = {
+export type AccountInput = {
     name: string;
     email: string;
     password: string;

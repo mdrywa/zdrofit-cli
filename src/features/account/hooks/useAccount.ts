@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import type {Account, CreateAccountInput} from "../account.types.ts";
+import type {Account, AccountInput} from "../account.types.ts";
 import {getAccounts} from "../repository/account.repository.ts";
 import {
     createAccount,
@@ -49,7 +49,7 @@ export function useAccount() {
         void loadAccounts();
     }, []);
 
-    async function addAccount(input: CreateAccountInput): Promise<Account> {
+    async function addAccount(input: AccountInput): Promise<Account> {
         setError(null);
 
         try {

@@ -5,13 +5,17 @@ import {
     type Page,
 } from "playwright";
 
-let browser: Browser | null = null;
+const browsers = new Map<boolean, Browser>();
 
-export async function createBrowserSession(headless: boolean): Promise<{context: BrowserContext; page: Page}> {
-    if (!browser) {
+export async function createBrowserSession(headless: boolean): Promise<{ context: BrowserContext; page: Page }> {
+    let browser = browsers.get(headless);
+
+    if (!browser || !browser.isConnected()) {
         browser = await chromium.launch({
             headless,
         });
+
+        browsers.set(headless, browser);
     }
 
     const context = await browser.newContext();
@@ -25,10 +29,11 @@ export async function closeBrowserSession(context: BrowserContext): Promise<void
 }
 
 export async function closeBrowser(): Promise<void> {
-    if (!browser) {
-        return;
-    }
+    const browserInstances = [...browsers.values()];
 
-    await browser.close();
-    browser = null;
+    browsers.clear();
+
+    await Promise.all(
+        browserInstances.map(browser => browser.close()),
+    );
 }

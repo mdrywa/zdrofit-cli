@@ -12,6 +12,7 @@ type MainMenuScreenProps = {
     sessionActive: string;
     sessionError: string | null;
     onAccountClick: () => void;
+    onClubsClick: () => void;
     onSessionRefresh: () => Promise<boolean>;
     onExit: () => void;
 }
@@ -21,12 +22,17 @@ export function MainMenuScreen({
     sessionActive,
     sessionError,
     onAccountClick,
+    onClubsClick,
     onSessionRefresh,
     onExit,
 }: MainMenuScreenProps): React.ReactElement {
     useInput((input) => {
         if (input.toLowerCase() === "a") {
             onAccountClick();
+        }
+
+        if (input.toLowerCase() === "c") {
+            onClubsClick();
         }
 
         if (input.toLowerCase() === "r") {
