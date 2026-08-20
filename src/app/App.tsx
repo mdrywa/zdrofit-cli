@@ -35,7 +35,10 @@ export function App(){
         clubs,
         activeClub,
         selectClub,
+        isClubsLoading,
+        clubsError,
     } = useClubs();
+
     // Current screen
     const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
 
@@ -120,6 +123,8 @@ export function App(){
                     <ClubsScreen
                         clubs={clubs}
                         activeClub={activeClub}
+                        isLoading={isClubsLoading}
+                        error={clubsError}
                         returnClick={() => navigateTo("main-menu")}
                         clubSelectClick={handleClubChange}
                     />

@@ -1,5 +1,5 @@
 import React from "react";
-import {Box, useInput} from "ink";
+import {Box, Text, useInput} from "ink";
 import {ScreenLogo} from "../../shared/components/ScreenLogo.tsx";
 import {Divider} from "../../shared/components/Divider.tsx";
 import {NavigationHints} from "../../shared/components/NavigationHints.tsx";
@@ -14,6 +14,8 @@ import {SettingRow} from "../../shared/components/SettingRow.tsx";
 type ClubsScreenProps = {
     clubs: Club[];
     activeClub: Club | undefined;
+    isLoading: boolean;
+    error: string | null;
     returnClick: () => void;
     clubSelectClick: (club: Club) => void;
 }
@@ -32,6 +34,8 @@ export function ClubsScreen(
     {
         clubs,
         activeClub,
+        isLoading,
+        error,
         returnClick,
         clubSelectClick,
     }: ClubsScreenProps
@@ -66,7 +70,11 @@ export function ClubsScreen(
                 />
             </Box>
 
-            <SelectionList items={clubItems} maxItems={10}/>
+            {isLoading ? (<Text color={colors.text.secondary}>Pobieranie klubów ...</Text>) : null}
+            {error ? (<Text color={colors.status.error}>{error}</Text>) : null}
+
+            {!isLoading ? (<SelectionList items={clubItems} maxItems={10}/>) : null}
+
 
             <Divider/>
             <NavigationHints

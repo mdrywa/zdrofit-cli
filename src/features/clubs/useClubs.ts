@@ -7,8 +7,8 @@ import {getActiveClub, saveActiveClub} from "./clubs.repository.ts";
 export function useClubs() {
     const [clubs, setClubs] = useState<Club[]>([]);
     const [activeClub, setActiveClub] = useState<Club>();
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [isClubsLoading, setIsClubsLoading] = useState(true);
+    const [clubsError, setClubsError] = useState<string | null>(null);
 
     useEffect(() => {
         async function loadClubs(): Promise<void> {
@@ -31,12 +31,12 @@ export function useClubs() {
                 }
             }
             catch (error) {
-                setError(error instanceof Error
+                setClubsError(error instanceof Error
                     ? error.message
                     : "Nie udało się pobrać klubów");
             }
             finally {
-                setIsLoading(false);
+                setIsClubsLoading(false);
             }
         }
 
@@ -53,7 +53,7 @@ export function useClubs() {
         clubs,
         activeClub,
         selectClub,
-        isLoading,
-        error
+        isClubsLoading,
+        clubsError
     }
 }
