@@ -1,5 +1,5 @@
 import type {Account, AccountInput} from "../account.types.ts";
-import {getAccounts, saveAccounts} from "../repository/account.repository.ts";
+import {getAccounts, saveAccounts} from "../account.repository.ts";
 import {deletePassword, deleteSessionId, savePassword} from "./auth.service.ts";
 
 

@@ -6,9 +6,11 @@ import {NavigationHints} from "../../shared/components/NavigationHints.tsx";
 import {Divider} from "../../shared/components/Divider.tsx";
 import {SelectionList} from "../../shared/components/SelectionList.tsx";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
+import type {Club} from "../../features/clubs/clubs.types.ts";
 
 type MainMenuScreenProps = {
     activeAccount: string;
+    activeClub: Club | undefined;
     sessionActive: string;
     sessionError: string | null;
     onAccountClick: () => void;
@@ -19,6 +21,7 @@ type MainMenuScreenProps = {
 
 export function MainMenuScreen({
     activeAccount,
+    activeClub,
     sessionActive,
     sessionError,
     onAccountClick,
@@ -57,7 +60,9 @@ export function MainMenuScreen({
                 />
                 <SettingRow
                     label={"Klub"}
-                    value={"Zdrofit Klub Nieborowska 10 Gdańsk"}
+                    value={activeClub
+                        ? `${activeClub.name} - ${activeClub.street}, ${activeClub.city}`
+                        : "Brak wybranego klubu"}
                     shortcut={"C"}
                     actionLabel={"zmień"}
                 />

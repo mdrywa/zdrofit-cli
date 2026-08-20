@@ -11,9 +11,10 @@ export type SelectionListItem = {
 
 type SelectionListProps = {
     items: SelectionListItem[];
+    maxItems?: number;
 }
 
-export function SelectionList({items}: SelectionListProps) {
+export function SelectionList({items, maxItems = 10}: SelectionListProps) {
     const [selectedIndex, setSelectedIndex] = useState(0)
 
     useEffect(() => {
@@ -48,10 +49,22 @@ export function SelectionList({items}: SelectionListProps) {
         }
     })
 
+    const startIndex = Math.min(
+        Math.max(0, selectedIndex - maxItems + 1),
+        Math.max(0, items.length - maxItems)
+    );
+
+    const visibleItems = items.slice(
+        startIndex,
+        startIndex + maxItems
+    );
+
+
     return (
         <Box flexDirection="column">
-            {items.map((item, index) => {
-                const isSelected = selectedIndex === index;
+            {visibleItems.map((item, index) => {
+                const realIndex = startIndex + index;
+                const isSelected = realIndex === selectedIndex;
 
                 return (
                     <Text

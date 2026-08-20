@@ -3,9 +3,10 @@ import {Box, useApp} from "ink";
 import {MainMenuScreen} from "./screens/MainMenuScreen.tsx";
 import {AccountsScreen} from "../features/account/screens/AccountsScreen.tsx";
 import {NewAccountScreen} from "../features/account/screens/NewAccountScreen.tsx";
-import {useAccount} from "../features/account/hooks/useAccount.ts";
-import {closeBrowser} from "../infrastructure/playwright/browser.service.ts";
-import {ClubsScreen} from "../features/clubs/screens/ClubsScreen.tsx";
+import {useAccount} from "../features/account/useAccount.ts";
+import {ClubsScreen} from "../features/clubs/ClubsScreen.tsx";
+import {useClubs} from "../features/clubs/useClubs.ts";
+import type {Club} from "../features/clubs/clubs.types.ts";
 
 type AppScreen =
     "main-menu" |
@@ -29,6 +30,12 @@ export function App(){
         switchAccount,
         refreshSession,
     } = useAccount();
+
+    const {
+        clubs,
+        activeClub,
+        selectClub,
+    } = useClubs();
     // Current screen
     const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
 
@@ -58,8 +65,13 @@ export function App(){
         await switchAccount(accountId);
     }
 
+    async function handleClubChange(club: Club) {
+        navigateTo("main-menu");
+        await selectClub(club);
+    }
+
+
     async function handleExit(): Promise<void> {
-        await closeBrowser();
         exit()
     }
 
@@ -70,6 +82,7 @@ export function App(){
             return (
                 <MainMenuScreen
                     activeAccount={activeAccountLabel}
+                    activeClub={activeClub}
                     sessionActive={sessionStatus}
                     sessionError={error}
                     onAccountClick={() => navigateTo("accounts")}
@@ -105,7 +118,10 @@ export function App(){
             case "clubs":
                 return (
                     <ClubsScreen
+                        clubs={clubs}
+                        activeClub={activeClub}
                         returnClick={() => navigateTo("main-menu")}
+                        clubSelectClick={handleClubChange}
                     />
                 )
         }

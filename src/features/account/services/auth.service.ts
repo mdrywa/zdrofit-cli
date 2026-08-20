@@ -1,16 +1,11 @@
 import {secrets} from "bun";
-import {errors, type BrowserContext} from "playwright";
 import type {Account} from "../account.types.ts";
 import {
-    closeBrowserSession,
-    createBrowserSession,
-} from "../../../infrastructure/playwright/browser.service.ts";
+    checkSessionInBrowser,
+    loginInBrowser,
+} from "../../../infrastructure/playwright/playwright-worker.service.ts";
 
 const SERVICE_NAME = "com.zdrofit.cli";
-const LOGIN_URL = "https://zdrofit.pl/#logowanie";
-const SESSION_CHECK_URL = "https://zdrofit.pl";
-const SESSION_COOKIE_NAME = "SULUSESSID";
-const SESSION_CHECK_TIMEOUT_MS = 15_000;
 
 function getPasswordSecretName(accountId: string): string {
     return `account:${accountId}:password`;
@@ -24,63 +19,20 @@ export async function login(account: Account): Promise<void> {
     const password = await getPassword(account.id);
 
     if (!password) {
-        throw new Error("Account password does not exist");
+        throw new Error(
+            "Nie znaleziono hasła aktywnego konta w systemowym magazynie poświadczeń",
+        );
     }
-
-    let sessionId: string | undefined;
-    let context: BrowserContext | undefined;
 
     try {
-        const browserSession = await createBrowserSession(false);
-        context = browserSession.context;
-        const {page} = browserSession;
-
-        await page.goto(LOGIN_URL, {
-            waitUntil: "domcontentloaded",
-        });
-
-        await page.waitForSelector("#member_login_form_email");
-        await page.waitForSelector("#member_login_form_password");
-
-        await page.locator("#member_login_form_email").fill(account.email);
-        await page.locator("#member_login_form_password").fill(password);
-
-        await page.waitForURL(
-            url => !url.hash.includes("logowanie"),
-            {
-                timeout: 150_000,
-                waitUntil: "networkidle",
-            },
-        );
-
-        const sessionCookie = (await context.cookies()).find(
-            cookie => cookie.name === SESSION_COOKIE_NAME,
-        );
-
-        sessionId = sessionCookie?.value;
+        const sessionId = await loginInBrowser(account.email, password);
+        await saveSessionId(account.id, sessionId);
     }
     catch (error: unknown) {
-        if (error instanceof errors.TimeoutError) {
-            throw new Error("Logowanie przekroczyło limit czasu", {
-                cause: error,
-            });
-        }
-
-        throw new Error("Failed to login account", {
+        throw new Error(`Nie udało się zalogować: ${getErrorMessage(error)}`, {
             cause: error,
         });
     }
-    finally {
-        if (context) {
-            await closeBrowserSession(context);
-        }
-    }
-
-    if (!sessionId) {
-        throw new Error(`Cookie ${SESSION_COOKIE_NAME} not found`);
-    }
-
-    await saveSessionId(account.id, sessionId);
 }
 
 export async function checkSession(account: Account): Promise<boolean> {
@@ -90,50 +42,13 @@ export async function checkSession(account: Account): Promise<boolean> {
         return false;
     }
 
-    let context: BrowserContext | undefined;
-
     try {
-        const browserSession = await createBrowserSession(true);
-        context = browserSession.context;
-        const {page} = browserSession;
-
-        await context.addCookies([
-            {
-                name: SESSION_COOKIE_NAME,
-                value: sessionId,
-                url: "https://zdrofit.pl",
-            },
-        ]);
-
-        await page.goto(SESSION_CHECK_URL, {
-            waitUntil: "networkidle",
-            timeout: SESSION_CHECK_TIMEOUT_MS,
-        });
-
-        const loginText = page.getByText("Loguję się", {exact: true});
-        const loginTextCount = await loginText.count();
-
-        for (let index = 0; index < loginTextCount; index++) {
-            if (await loginText.nth(index).isVisible()) {
-                return false;
-            }
-        }
-
-        return true;
+        return await checkSessionInBrowser(sessionId);
     }
     catch (error: unknown) {
-        if (error instanceof errors.TimeoutError) {
-            return false;
-        }
-
-        throw new Error("Nie udało się sprawdzić sesji", {
+        throw new Error(`Nie udało się sprawdzić sesji: ${getErrorMessage(error)}`, {
             cause: error,
         });
-    }
-    finally {
-        if (context) {
-            await closeBrowserSession(context);
-        }
     }
 }
 
@@ -183,6 +98,14 @@ export async function savePassword(
         value: password,
         allowUnrestrictedAccess: false,
     });
+
+    const savedPassword = await getPassword(accountId);
+
+    if (savedPassword !== password) {
+        throw new Error(
+            "Nie udało się zweryfikować hasła w systemowym magazynie poświadczeń",
+        );
+    }
 }
 
 export async function getPassword(accountId: string): Promise<string | null> {
@@ -197,4 +120,8 @@ export async function deletePassword(accountId: string): Promise<void> {
         service: SERVICE_NAME,
         name: getPasswordSecretName(accountId),
     });
+}
+
+function getErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
 }

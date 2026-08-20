@@ -1,12 +1,12 @@
 import {useEffect, useState} from "react";
-import type {Account, AccountInput} from "../account.types.ts";
-import {getAccounts} from "../repository/account.repository.ts";
+import type {Account, AccountInput} from "./account.types.ts";
+import {getAccounts} from "./account.repository.ts";
 import {
     createAccount,
     deleteAccount as deleteAccountService,
     switchAccount as switchAccountService,
-} from "../services/account.service.ts";
-import {checkSession, login} from "../services/auth.service.ts";
+} from "./services/account.service.ts";
+import {checkSession, login} from "./services/auth.service.ts";
 
 
 export function useAccount() {
@@ -36,7 +36,7 @@ export function useAccount() {
 
                 setIsSessionActive(await checkSession(savedActiveAccount));
             }
-            catch (error: unknown) {
+            catch (error) {
                 setError(getErrorMessage(error));
                 setIsSessionActive(false);
             }

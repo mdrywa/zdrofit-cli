@@ -12,6 +12,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "cheerio": "^1.2.0",
     "env-paths": "^4.0.0",
     "figlet": "^1.11.4",
     "ink": "^7.1.1",
