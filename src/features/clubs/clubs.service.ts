@@ -28,7 +28,7 @@ function parseClubs(html: string): Club[] {
             return;
 
         const name = club.find("strong")?.text() ?? "";
-        const street = club.find("address").text().trim().split(",")[0] ?? "";
+        const street = club.find("address")?.text().trim().split(",")[0] ?? "";
         const city = club.attr("data-city")?.trim() ?? "";
         const href = club.find("a").attr("href") ?? "";
 

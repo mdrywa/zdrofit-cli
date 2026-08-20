@@ -13,6 +13,9 @@ export function useClubs() {
     useEffect(() => {
         async function loadClubs(): Promise<void> {
             try {
+                setIsClubsLoading(true);
+                setClubsError(null);
+
                 const savedClub = await getActiveClub();
                 setActiveClub(savedClub);
 

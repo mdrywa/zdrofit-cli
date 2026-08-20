@@ -7,12 +7,15 @@ import {useAccount} from "../features/account/useAccount.ts";
 import {ClubsScreen} from "../features/clubs/ClubsScreen.tsx";
 import {useClubs} from "../features/clubs/useClubs.ts";
 import type {Club} from "../features/clubs/clubs.types.ts";
+import {ClassesScreen} from "../features/classes/ClassesScreen.tsx";
+import {useClasses} from "../features/classes/useClasses.ts";
 
 type AppScreen =
     "main-menu" |
     "accounts" |
     "new-account" |
-    "clubs"
+    "clubs" |
+    "classes"
 
 export function App(){
     // Exit app function
@@ -38,6 +41,12 @@ export function App(){
         isClubsLoading,
         clubsError,
     } = useClubs();
+
+    const {
+        classes,
+        isClassesLoading,
+        classesError,
+    } = useClasses({selectedClub: activeClub})
 
     // Current screen
     const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
@@ -91,6 +100,7 @@ export function App(){
                     onAccountClick={() => navigateTo("accounts")}
                     onClubsClick={() => navigateTo("clubs")}
                     onSessionRefresh={refreshSession}
+                    onClassesClick={() => navigateTo("classes")}
                     onExit={handleExit}
                 />
             )
@@ -127,6 +137,13 @@ export function App(){
                         error={clubsError}
                         returnClick={() => navigateTo("main-menu")}
                         clubSelectClick={handleClubChange}
+                    />
+                )
+            case "classes":
+                return (
+                    <ClassesScreen
+                        classes={classes}
+                        returnClick={() => navigateTo("main-menu")}
                     />
                 )
         }
