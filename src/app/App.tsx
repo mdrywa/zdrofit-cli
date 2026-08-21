@@ -143,6 +143,7 @@ export function App(){
                 return (
                     <ClassesScreen
                         classes={classes}
+                        activeClub={activeClub}
                         returnClick={() => navigateTo("main-menu")}
                     />
                 )

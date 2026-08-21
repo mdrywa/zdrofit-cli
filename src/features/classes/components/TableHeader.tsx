@@ -1,5 +1,5 @@
 import React from "react";
-import type {TableColumn} from "./SelectableTable.tsx";
+import type {TableColumn} from "./ClassesTable.tsx";
 import {Box, Text} from "ink";
 
 type TableHeaderProps<T> = {
@@ -17,7 +17,7 @@ export function TableHeader<T>({
 
             {columns.map(column => (
                 <Box key={column.id} width={column.width}>
-                   <Text bold underline>{column.header}</Text>
+                    <Text bold underline>{column.header}</Text>
                 </Box>
             ))}
         </Box>

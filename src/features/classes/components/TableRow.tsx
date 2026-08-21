@@ -1,7 +1,7 @@
 import React from "react";
-import type {TableColumn} from "./SelectableTable.tsx";
+import type {TableColumn} from "./ClassesTable.tsx";
 import {Box, Text} from "ink";
-import {colors} from "../../theme/colors.ts";
+import {colors} from "../../../theme/colors.ts";
 
 type TableRowProps<T> = {
     row: T;

@@ -10,6 +10,8 @@ import {
 } from "../../shared/components/SelectionList.tsx";
 import {colors} from "../../theme/colors.ts";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
+import {getClubLongName} from "./clubs.utils.ts";
+import {clubToSelectionListItem} from "./clubs.mappers.ts";
 
 type ClubsScreenProps = {
     clubs: Club[];
@@ -18,16 +20,6 @@ type ClubsScreenProps = {
     error: string | null;
     returnClick: () => void;
     clubSelectClick: (club: Club) => void;
-}
-
-function clubToSelectionListItem(club: Club, onSelect: (club: Club) => void): SelectionListItem {
-    const location = [club.street, club.city].filter(Boolean).join(", ");
-
-    return {
-        id: club.id,
-        label: location ? `${club.name} - ${location}` : club.name,
-        onSelect: () => onSelect(club),
-    };
 }
 
 export function ClubsScreen(
@@ -63,9 +55,9 @@ export function ClubsScreen(
                 borderColor={colors.border.active}
             >
                 <SettingRow
-                    label={"Konto"}
+                    label={"Klub"}
                     value={activeClub
-                    ? `${activeClub.name} - ${activeClub.street}, ${activeClub.city}`
+                    ? getClubLongName(activeClub)
                     : "Brak wybranego klubu"}
                 />
             </Box>

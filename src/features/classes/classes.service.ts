@@ -31,6 +31,7 @@ function parseClasses(html: string): Class[] {
         const date = item.attr("data-day")?.trim() ?? "";
         const time = item.find("time").text().trim();
         const trainer = item.find("a.trainer").text().trim();
+
         const href = item.find("a[data-fetch-fragments='#rezerwacja']").attr("href")?.trim() ?? "";
 
         classes.push({

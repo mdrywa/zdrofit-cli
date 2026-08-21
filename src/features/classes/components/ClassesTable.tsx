@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Box, Text, useInput} from "ink";
 import {TableHeader} from "./TableHeader.tsx";
 import {TableRow} from "./TableRow.tsx";
@@ -10,23 +10,23 @@ export type TableColumn<T> = {
     render: (row: T) => string;
 }
 
-type SelectableTableProps<T> = {
+type ClassesTablePops<T> = {
     rows: T[];
     columns: TableColumn<T>[];
     getRowId: (row: T) => string;
     onSelect: (row: T) => void;
     onDelete?: (row: T) => void;
-    isActive?: boolean;
+    isActive: boolean;
 }
 
-export function SelectableTable<T>({
+export function ClassesTable<T>({
     rows,
     columns,
     getRowId,
     onSelect,
     onDelete,
     isActive,
-}: SelectableTableProps<T>) {
+}: ClassesTablePops<T>) {
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     useEffect(() => {
@@ -70,21 +70,17 @@ export function SelectableTable<T>({
     }, {isActive})
 
     return (
-        <Box flexDirection="column">
+        <Box flexDirection={"column"}>
             <TableHeader columns={columns}/>
 
-            {rows.length === 0 ? (
-                <Text dimColor>Brak danych</Text>
-            ) : (
-                rows.map((row, index) => (
-                    <TableRow
-                        key={getRowId(row)}
-                        row={row}
-                        columns={columns}
-                        isSelected={index === selectedIndex}
-                    />
-                ))
-            )}
+            {rows.length === 0 ?
+                (<Text dimColor>Brak danych</Text>) :
+                (
+                    rows.map((row, index) => (
+                        <TableRow key={getRowId(row)} row={row} columns={columns} isSelected={isActive && index === selectedIndex}/>
+                    ))
+                )}
+
         </Box>
     )
-} 
+}

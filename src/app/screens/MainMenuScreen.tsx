@@ -7,6 +7,7 @@ import {Divider} from "../../shared/components/Divider.tsx";
 import {SelectionList} from "../../shared/components/SelectionList.tsx";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
 import type {Club} from "../../features/clubs/clubs.types.ts";
+import {getClubShortName} from "../../features/clubs/clubs.utils.ts";
 
 type MainMenuScreenProps = {
     activeAccount: string;
@@ -63,7 +64,7 @@ export function MainMenuScreen({
                 <SettingRow
                     label={"Klub"}
                     value={activeClub
-                        ? `${activeClub.name} - ${activeClub.street}, ${activeClub.city}`
+                        ? getClubShortName(activeClub)
                         : "Brak wybranego klubu"}
                     shortcut={"C"}
                     actionLabel={"zmień"}
