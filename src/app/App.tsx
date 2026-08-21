@@ -9,6 +9,7 @@ import {useClubs} from "../features/clubs/useClubs.ts";
 import type {Club} from "../features/clubs/clubs.types.ts";
 import {ClassesScreen} from "../features/classes/ClassesScreen.tsx";
 import {useClasses} from "../features/classes/useClasses.ts";
+import type {Account} from "../features/account/account.types.ts";
 
 type AppScreen =
     "main-menu" |
@@ -32,6 +33,7 @@ export function App(){
         deleteAccount,
         switchAccount,
         refreshSession,
+        deactivateSession,
     } = useAccount();
 
     const {
@@ -46,7 +48,11 @@ export function App(){
         classes,
         isClassesLoading,
         classesError,
-    } = useClasses({selectedClub: activeClub})
+    } = useClasses({
+        selectedClub: activeClub,
+        activeAccount,
+        isSessionActive,
+    })
 
     // Current screen
     const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
@@ -82,6 +88,11 @@ export function App(){
         await selectClub(club);
     }
 
+    async function handleDeleteAccount(accountId: string) {
+        await deleteAccount(accountId);
+        deactivateSession();
+    }
+
 
     async function handleExit(): Promise<void> {
         exit()
@@ -115,7 +126,7 @@ export function App(){
                     returnClick={() => navigateTo("main-menu")}
                     newAccountClick={() => navigateTo("new-account")}
                     accountChangeClick={handleAccountChange}
-                    deleteAccountClick={deleteAccount}
+                    deleteAccountClick={handleDeleteAccount}
                 />
             )
             case "new-account":

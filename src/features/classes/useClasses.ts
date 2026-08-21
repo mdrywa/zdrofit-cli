@@ -2,13 +2,18 @@ import {useEffect, useState} from "react";
 import type {Class} from "./classes.types.ts";
 import type {Club} from "../clubs/clubs.types.ts";
 import {getClasses} from "./classes.service.ts";
+import type {Account} from "../account/account.types.ts";
 
 type useClassesProps = {
     selectedClub: Club | undefined;
+    activeAccount: Account | undefined;
+    isSessionActive: boolean | null;
 }
 
 export function useClasses({
     selectedClub,
+    activeAccount,
+    isSessionActive,
 }: useClassesProps) {
     const [classes, setClasses] = useState<Class[]>([]);
     const [isClassesLoading, setIsClassesLoading] = useState<boolean>(true);
@@ -28,7 +33,7 @@ export function useClasses({
 
                 const classesUrl = `https://zdrofit.pl${selectedClub.href}grafik-zajec`
 
-                const loadedClasses = await getClasses(classesUrl);
+                const loadedClasses = await getClasses(classesUrl, activeAccount);
                 setClasses(loadedClasses);
             }
             catch (error) {
@@ -42,7 +47,7 @@ export function useClasses({
         }
 
         void loadClasses();
-    }, [selectedClub])
+    }, [selectedClub, activeAccount, isSessionActive])
 
 
     return {

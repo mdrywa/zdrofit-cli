@@ -144,6 +144,10 @@ export function useAccount() {
         }
     }
 
+    function deactivateSession(): void {
+        setIsSessionActive(false);
+    }
+
     return {
         accounts,
         activeAccount,
@@ -156,6 +160,7 @@ export function useAccount() {
         deleteAccount,
         switchAccount,
         refreshSession,
+        deactivateSession,
     };
 }
 

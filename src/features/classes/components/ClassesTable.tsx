@@ -8,6 +8,7 @@ export type TableColumn<T> = {
     header: string;
     width: number;
     render: (row: T) => string;
+    color?: (row:T) => string;
 }
 
 type ClassesTablePops<T> = {

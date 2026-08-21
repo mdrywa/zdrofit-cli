@@ -25,7 +25,10 @@ export function TableRow<T>({
             {columns.map(column => (
                 <Box key={column.id} width={column.width}>
                     <Text
-                        color={isSelected ? colors.brand : colors.text.primary}
+                        color={
+                            column.color?.(row)
+                            ?? (isSelected ? colors.brand : colors.text.primary)
+                        }
                         bold={isSelected}
                         wrap="truncate-end"
                     >
