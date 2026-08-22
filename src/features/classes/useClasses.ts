@@ -1,8 +1,9 @@
 import {useEffect, useState} from "react";
 import type {Class} from "./classes.types.ts";
 import type {Club} from "../clubs/clubs.types.ts";
-import {getClasses} from "./classes.service.ts";
+import {bookClass, cancelClassBooking, getClasses} from "./classes.service.ts";
 import type {Account} from "../account/account.types.ts";
+import {getClassUrl, getClubScheduler} from "../../zdrofit/zdrofit.urls.ts";
 
 type useClassesProps = {
     selectedClub: Club | undefined;
@@ -31,9 +32,9 @@ export function useClasses({
                 setIsClassesLoading(true);
                 setClassesError(null);
 
-                const classesUrl = `https://zdrofit.pl${selectedClub.href}grafik-zajec`
+                const clubScheduleUrl = getClubScheduler(selectedClub.href);
 
-                const loadedClasses = await getClasses(classesUrl, activeAccount);
+                const loadedClasses = await getClasses(clubScheduleUrl, activeAccount);
                 setClasses(loadedClasses);
             }
             catch (error) {
@@ -49,10 +50,59 @@ export function useClasses({
         void loadClasses();
     }, [selectedClub, activeAccount, isSessionActive])
 
+    async function classBooking(classItem: Class): Promise<void> {
+        if (!activeAccount) {
+            setClassesError("Brak aktywnego konta");
+            return;
+        }
+
+        if (!selectedClub) {
+            setClassesError("Brak aktywnego klubu");
+            return;
+        }
+
+        if (classItem.status !== "available" && classItem.status !== "booked") {
+            setClassesError("Nie można wykonać tej akcji dla wybranych zajęć");
+            return;
+        }
+
+        try {
+            setClassesError(null);
+
+            const classUrl = getClassUrl(classItem.href);
+
+            if (classItem.status === "available") {
+                await bookClass(
+                    classUrl,
+                    classItem.id,
+                    activeAccount,
+                );
+            }
+            else {
+                await cancelClassBooking(
+                    classUrl,
+                    classItem.id,
+                    activeAccount,
+                );
+            }
+
+            const clubScheduleUrl = getClubScheduler(selectedClub.href);
+            const updatedClasses = await getClasses(clubScheduleUrl, activeAccount);
+            setClasses(updatedClasses);
+        } catch (error) {
+            setClassesError(
+                error instanceof Error
+                    ? error.message
+                    : "Nie udało się zarezerwować zajęć"
+            );
+        }
+    }
+
 
     return {
         classes,
         isClassesLoading,
         classesError,
+        classBooking
     }
 }

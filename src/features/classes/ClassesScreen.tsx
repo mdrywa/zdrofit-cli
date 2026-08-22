@@ -13,12 +13,14 @@ import {getClubLongName} from "../clubs/clubs.utils.ts";
 type ClassesScreenProps = {
     classes: Class[];
     activeClub: Club | undefined;
+    onSelect: (oneCLass: Class) => void;
     returnClick: () => void;
 }
 
 export function ClassesScreen({
     classes,
     activeClub,
+    onSelect,
     returnClick,
 }:ClassesScreenProps) {
 
@@ -128,7 +130,7 @@ export function ClassesScreen({
                     },
                 ]}
                 getRowId={row => row.id}
-                onSelect={(row) => console.log("Wybrano: ", row.name)}
+                onSelect={onSelect}
                 isActive={true}
             />
 

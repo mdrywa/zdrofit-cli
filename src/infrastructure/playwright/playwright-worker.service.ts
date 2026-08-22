@@ -59,7 +59,7 @@ export async function checkSessionInBrowser(
 
 async function runWorker<T>(request: WorkerRequest): Promise<T> {
     return await new Promise<T>((resolve, reject) => {
-        const child = spawn("node", [WORKER_PATH], {
+        const child = spawn("node", ["--experimental-strip-types", WORKER_PATH], {
             stdio: ["pipe", "pipe", "pipe"],
         });
         const stdoutChunks: Buffer[] = [];

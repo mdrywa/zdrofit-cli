@@ -1,12 +1,15 @@
 import {chromium} from "playwright";
+import {ZDROFIT_URLS} from "../../zdrofit/zdrofit.urls.ts";
+import {
+    ZDROFIT_LOGIN_TIMEOUT_MS,
+    ZDROFIT_SESSION_CHECK_TIMEOUT_MS,
+    ZDROFIT_SESSION_COOKIE_NAME
+} from "../../zdrofit/zdrofit.constants.ts";
 
-const LOGIN_URL = "https://zdrofit.pl/#logowanie";
-const SESSION_CHECK_URL = "https://zdrofit.pl";
-const SESSION_COOKIE_NAME = "SULUSESSID";
+
+
 const BROWSER_LAUNCH_TIMEOUT_MS = 30_000;
 const PAGE_LOAD_TIMEOUT_MS = 30_000;
-const LOGIN_TIMEOUT_MS = 150_000;
-const SESSION_CHECK_TIMEOUT_MS = 15_000;
 
 async function readRequest() {
     let input = "";
@@ -22,18 +25,18 @@ async function waitForSuccessfulLogin(context, page) {
     await page.waitForURL(
         url => !url.hash.includes("logowanie"),
         {
-            timeout: LOGIN_TIMEOUT_MS,
+            timeout: ZDROFIT_LOGIN_TIMEOUT_MS,
             waitUntil: "domcontentloaded",
         },
     );
 
     const sessionCookie = (await context.cookies()).find(
-        cookie => cookie.name === SESSION_COOKIE_NAME,
+        cookie => cookie.name === ZDROFIT_SESSION_COOKIE_NAME,
     );
 
     if (!sessionCookie?.value) {
         throw new Error(
-            `Po zalogowaniu nie znaleziono cookie ${SESSION_COOKIE_NAME}`,
+            `Po zalogowaniu nie znaleziono cookie ${ZDROFIT_SESSION_COOKIE_NAME}`,
         );
     }
 
@@ -50,7 +53,7 @@ async function login({email, password}) {
         const context = await browser.newContext();
         const page = await context.newPage();
 
-        await page.goto(LOGIN_URL, {
+        await page.goto(ZDROFIT_URLS.login, {
             waitUntil: "domcontentloaded",
             timeout: PAGE_LOAD_TIMEOUT_MS,
         });
@@ -86,15 +89,15 @@ async function checkSession({sessionId}) {
 
         await context.addCookies([
             {
-                name: SESSION_COOKIE_NAME,
+                name: ZDROFIT_SESSION_COOKIE_NAME,
                 value: sessionId,
-                url: SESSION_CHECK_URL,
+                url: ZDROFIT_URLS.home,
             },
         ]);
 
-        await page.goto(SESSION_CHECK_URL, {
+        await page.goto(ZDROFIT_URLS.home, {
             waitUntil: "domcontentloaded",
-            timeout: SESSION_CHECK_TIMEOUT_MS,
+            timeout: ZDROFIT_SESSION_CHECK_TIMEOUT_MS,
         });
 
         const loginText = page.getByText("Loguję się", {exact: true});

@@ -1,10 +1,10 @@
 import type {Club} from "./clubs.types.ts";
 import * as cheerio from "cheerio";
+import {ZDROFIT_URLS} from "../../zdrofit/zdrofit.urls.ts";
 
-const CLUBS_URL = "https://zdrofit.pl/kluby-fitness";
 
 export async function getClubs(): Promise<Club[]> {
-    const response = await fetch(CLUBS_URL);
+    const response = await fetch(ZDROFIT_URLS.clubs);
 
     if (!response.ok) {
         throw new Error(`Nie udało się pobrać klubów: HTTP ${response.status}`);

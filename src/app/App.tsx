@@ -48,6 +48,7 @@ export function App(){
         classes,
         isClassesLoading,
         classesError,
+        classBooking
     } = useClasses({
         selectedClub: activeClub,
         activeAccount,
@@ -155,6 +156,7 @@ export function App(){
                     <ClassesScreen
                         classes={classes}
                         activeClub={activeClub}
+                        onSelect={classBooking}
                         returnClick={() => navigateTo("main-menu")}
                     />
                 )
