@@ -10,13 +10,17 @@ import type {Club} from "../features/clubs/clubs.types.ts";
 import {ClassesScreen} from "../features/classes/ClassesScreen.tsx";
 import {useClasses} from "../features/classes/useClasses.ts";
 import type {Account} from "../features/account/account.types.ts";
+import {ReservationsScreen} from "../features/reservations/ReservationsScreen.tsx";
+import {getAccountLongName} from "../features/account/account.utils.ts";
+import {useReservations} from "../features/reservations/useReservations.ts";
 
 type AppScreen =
     "main-menu" |
     "accounts" |
     "new-account" |
     "clubs" |
-    "classes"
+    "classes" |
+    "reservations"
 
 export function App(){
     // Exit app function
@@ -45,6 +49,12 @@ export function App(){
     } = useClubs();
 
     const {
+        reservations,
+        createReservation,
+        deleteReservation,
+    } = useReservations(activeAccount);
+
+    const {
         classes,
         isClassesLoading,
         classesError,
@@ -53,6 +63,8 @@ export function App(){
         selectedClub: activeClub,
         activeAccount,
         isSessionActive,
+        createReservation,
+        deleteReservation,
     })
 
     // Current screen
@@ -63,7 +75,7 @@ export function App(){
     }
 
     const activeAccountLabel = activeAccount
-        ? `${activeAccount.name} - ${activeAccount.email}`
+        ? `${getAccountLongName(activeAccount)}`
         : "Brak aktywnego konta";
 
     const sessionStatus = isCheckingSession
@@ -113,6 +125,7 @@ export function App(){
                     onClubsClick={() => navigateTo("clubs")}
                     onSessionRefresh={refreshSession}
                     onClassesClick={() => navigateTo("classes")}
+                    onReservationsClick={() => navigateTo("reservations")}
                     onExit={handleExit}
                 />
             )
@@ -158,6 +171,14 @@ export function App(){
                         activeClub={activeClub}
                         onSelect={classBooking}
                         returnClick={() => navigateTo("main-menu")}
+                    />
+                )
+            case "reservations":
+                return (
+                    <ReservationsScreen
+                        reservations={reservations}
+                        activeAccount={activeAccountLabel}
+                        onReturn={() => navigateTo("main-menu")}
                     />
                 )
         }

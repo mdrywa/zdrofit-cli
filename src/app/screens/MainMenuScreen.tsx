@@ -18,6 +18,7 @@ type MainMenuScreenProps = {
     onClubsClick: () => void;
     onSessionRefresh: () => Promise<boolean>;
     onClassesClick: () => void;
+    onReservationsClick: () => void;
     onExit: () => void;
 }
 
@@ -30,6 +31,7 @@ export function MainMenuScreen({
     onClubsClick,
     onSessionRefresh,
     onClassesClick,
+    onReservationsClick,
     onExit,
 }: MainMenuScreenProps): React.ReactElement {
     useInput((input) => {
@@ -93,7 +95,7 @@ export function MainMenuScreen({
                 {
                     id: "reservations",
                     label: "Zaplanowane rezerwacje",
-                    onSelect: () => console.log("Zaplanowane rezerwacje"),
+                    onSelect: onReservationsClick,
                 },
                 {
                     id: "settings",

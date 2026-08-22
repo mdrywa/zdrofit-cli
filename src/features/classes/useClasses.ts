@@ -4,17 +4,22 @@ import type {Club} from "../clubs/clubs.types.ts";
 import {bookClass, cancelClassBooking, getClasses} from "./classes.service.ts";
 import type {Account} from "../account/account.types.ts";
 import {getClassUrl, getClubScheduler} from "../../zdrofit/zdrofit.urls.ts";
+import type {Reservation} from "../reservations/reservations.types.ts";
 
 type useClassesProps = {
     selectedClub: Club | undefined;
     activeAccount: Account | undefined;
     isSessionActive: boolean | null;
+    createReservation: (reservation: Reservation) => Promise<void>;
+    deleteReservation: (reservation: Reservation) => Promise<void>;
 }
 
 export function useClasses({
     selectedClub,
     activeAccount,
     isSessionActive,
+    createReservation,
+    deleteReservation,
 }: useClassesProps) {
     const [classes, setClasses] = useState<Class[]>([]);
     const [isClassesLoading, setIsClassesLoading] = useState<boolean>(true);
@@ -70,6 +75,16 @@ export function useClasses({
             setClassesError(null);
 
             const classUrl = getClassUrl(classItem.href);
+            const reservation: Reservation = {
+                id: `${activeAccount.id}:${selectedClub.id}:${classItem.id}`,
+                account: activeAccount,
+                club: selectedClub,
+                classItem: {
+                    ...classItem,
+                    canBook: false,
+                    status: "booked",
+                },
+            };
 
             if (classItem.status === "available") {
                 await bookClass(
@@ -77,6 +92,8 @@ export function useClasses({
                     classItem.id,
                     activeAccount,
                 );
+
+                await createReservation(reservation);
             }
             else {
                 await cancelClassBooking(
@@ -84,6 +101,8 @@ export function useClasses({
                     classItem.id,
                     activeAccount,
                 );
+
+                await deleteReservation(reservation);
             }
 
             const clubScheduleUrl = getClubScheduler(selectedClub.href);

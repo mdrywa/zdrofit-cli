@@ -7,6 +7,7 @@ import {NavigationHints} from "../../../shared/components/NavigationHints.tsx";
 import {SelectionList} from "../../../shared/components/SelectionList.tsx";
 import {ScreenLogo} from "../../../shared/components/ScreenLogo.tsx";
 import type {Account} from "../account.types.ts";
+import {getAccountLongName} from "../account.utils.ts";
 
 
 export type AccountScreenProps = {
@@ -70,7 +71,7 @@ export function AccountsScreen({
                         },
                         ...accounts.map(account => ({
                             id: account.id,
-                            label: `${account.name} - ${account.email}${account.isActive ? " (aktywne)" : ""}`,
+                            label: `${getAccountLongName(account)}${account.isActive ? " (aktywne)" : ""}`,
                             onSelect: () => {
                                 void accountChangeClick(account.id).catch(() => undefined);
                             },
