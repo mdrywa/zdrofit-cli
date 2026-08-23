@@ -2,10 +2,12 @@ import {useEffect, useState} from "react";
 import type {Reservation} from "./reservations.types.ts";
 import type {Account} from "../account/account.types.ts";
 import {
-    deleteReservation as deleteReservationService,
-    getReservations,
-    saveReservation,
+    addSavedReservation,
+    getSavedReservations,
+    removeSavedReservation,
 } from "./reservations.service.ts";
+import type {Club} from "../clubs/clubs.types.ts";
+import type {Class} from "../classes/classes.types.ts";
 
 
 export function useReservations(activeAccount: Account | undefined) {
@@ -26,7 +28,7 @@ export function useReservations(activeAccount: Account | undefined) {
                 setReservationsLoading(true);
                 setReservationsError(null);
 
-                const loadedReservations = (await getReservations()).filter(
+                const loadedReservations = (await getSavedReservations()).filter(
                     reservation => reservation.account.id === activeAccount.id,
                 );
                 setReservations(loadedReservations);
@@ -44,12 +46,27 @@ export function useReservations(activeAccount: Account | undefined) {
         void loadReservations();
     }, [activeAccount?.id]);
 
-    async function createReservation(reservation: Reservation): Promise<void> {
+    function buildReservation(account: Account, club: Club, classItem: Class): Reservation {
+        return {
+            id: `${account.id}:${club.id}:${classItem.id}`,
+            account,
+            club,
+            classItem: {
+                ...classItem,
+                canBook: false,
+                status: "booked",
+            },
+        };
+    }
+
+    async function addReservation(account: Account, club: Club, classItem: Class): Promise<void> {
         setReservationsError(null);
 
+        const reservation = buildReservation(account, club, classItem);
+
         try {
-            await saveReservation(reservation);
-            await reloadReservations();
+            await addSavedReservation(reservation);
+            await refreshReservations();
         }
         catch (error: unknown) {
             setReservationsError(getErrorMessage(
@@ -60,12 +77,14 @@ export function useReservations(activeAccount: Account | undefined) {
         }
     }
 
-    async function deleteReservation(reservation: Reservation): Promise<void> {
+    async function removeReservation(account: Account, club: Club, classItem: Class): Promise<void> {
         setReservationsError(null);
 
+        const reservation = buildReservation(account, club, classItem);
+
         try {
-            await deleteReservationService(reservation);
-            await reloadReservations();
+            await removeSavedReservation(reservation);
+            await refreshReservations();
         }
         catch (error: unknown) {
             setReservationsError(getErrorMessage(
@@ -76,13 +95,13 @@ export function useReservations(activeAccount: Account | undefined) {
         }
     }
 
-    async function reloadReservations(): Promise<void> {
+    async function refreshReservations(): Promise<void> {
         if (!activeAccount) {
             setReservations([]);
             return;
         }
 
-        const loadedReservations = (await getReservations()).filter(
+        const loadedReservations = (await getSavedReservations()).filter(
             reservation => reservation.account.id === activeAccount.id,
         );
         setReservations(loadedReservations);
@@ -93,8 +112,8 @@ export function useReservations(activeAccount: Account | undefined) {
         reservations,
         reservationsLoading,
         reservationsError,
-        createReservation,
-        deleteReservation,
+        addReservation,
+        removeReservation,
     }
 }
 

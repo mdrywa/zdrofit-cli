@@ -1,12 +1,12 @@
 import type {Reservation} from "./reservations.types.ts";
 import {getStoredReservations, saveReservations} from "./reservations.repository.ts";
 
-export async function getReservations(): Promise<Reservation[]> {
+export async function getSavedReservations(): Promise<Reservation[]> {
     return await getStoredReservations();
 }
 
-export async function saveReservation(reservation: Reservation): Promise<void> {
-    const currentReservations = await getReservations();
+export async function addSavedReservation(reservation: Reservation): Promise<void> {
+    const currentReservations = await getSavedReservations();
 
     const alreadyExists = currentReservations.some(
         currentReservation => currentReservation.id === reservation.id,
@@ -19,8 +19,8 @@ export async function saveReservation(reservation: Reservation): Promise<void> {
     await saveReservations([...currentReservations, reservation]);
 }
 
-export async function deleteReservation(reservation: Reservation): Promise<void> {
-    const currentReservations = await getReservations();
+export async function removeSavedReservation(reservation: Reservation): Promise<void> {
+    const currentReservations = await getSavedReservations();
 
     const newReservations = currentReservations.filter((res) => res.id !== reservation.id);
 

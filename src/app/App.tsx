@@ -50,21 +50,21 @@ export function App(){
 
     const {
         reservations,
-        createReservation,
-        deleteReservation,
+        addReservation,
+        removeReservation,
     } = useReservations(activeAccount);
 
     const {
         classes,
         isClassesLoading,
         classesError,
-        classBooking
+        toggleClassRegistration
     } = useClasses({
         selectedClub: activeClub,
         activeAccount,
         isSessionActive,
-        createReservation,
-        deleteReservation,
+        addReservation,
+        removeReservation,
     })
 
     // Current screen
@@ -169,7 +169,7 @@ export function App(){
                     <ClassesScreen
                         classes={classes}
                         activeClub={activeClub}
-                        onSelect={classBooking}
+                        onSelect={toggleClassRegistration}
                         returnClick={() => navigateTo("main-menu")}
                     />
                 )

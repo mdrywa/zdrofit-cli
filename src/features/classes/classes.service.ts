@@ -5,7 +5,7 @@ import {parseClasses} from "./classes.parser.ts";
 import * as cheerio from "cheerio";
 import {ZDROFIT_SESSION_COOKIE_NAME} from "../../zdrofit/zdrofit.constants.ts";
 
-export async function getClasses(clubScheduleUrl: string, account?: Account): Promise<Class[]> {
+export async function fetchClasses(clubScheduleUrl: string, account?: Account): Promise<Class[]> {
     const headers: Record<string, string> = {};
 
     if (account) {
@@ -32,7 +32,7 @@ export async function getClasses(clubScheduleUrl: string, account?: Account): Pr
 }
 
 
-export async function bookClass(classHref: string, classId: string, account: Account): Promise<void> {
+export async function registerForClass(classHref: string, classId: string, account: Account): Promise<void> {
     const sessionId = await getSessionId(account.id);
 
     if (!sessionId) {
@@ -43,7 +43,7 @@ export async function bookClass(classHref: string, classId: string, account: Acc
         Cookie: `${ZDROFIT_SESSION_COOKIE_NAME}=${sessionId}`,
     }
 
-    const token = await getScheduleRegisterFormToken(classHref, headers);
+    const token = await getClassRegistrationFormToken(classHref, headers);
 
     const body = new URLSearchParams({
         "schedule_register_form[id]": classId,
@@ -51,7 +51,7 @@ export async function bookClass(classHref: string, classId: string, account: Acc
         "schedule_register_form[_token]": token,
     });
 
-    const bookingResponse = await fetch(classHref, {
+    const registrationResponse = await fetch(classHref, {
         method: "POST",
         headers: {
             ...headers,
@@ -60,13 +60,13 @@ export async function bookClass(classHref: string, classId: string, account: Acc
         body,
     });
 
-    if (!bookingResponse.ok) {
-        throw new Error(`Rezerwacja nie powiodła się: ${bookingResponse.status}`);
+    if (!registrationResponse.ok) {
+        throw new Error(`Rejestracja na zajęcia nie powiodła się: ${registrationResponse.status}`);
     }
 }
 
 
-async function getScheduleRegisterFormToken(classHref: string, headers: {}): Promise<string> {
+async function getClassRegistrationFormToken(classHref: string, headers: {}): Promise<string> {
     const response = await fetch(classHref, {headers});
 
     if (!response.ok) {
@@ -86,7 +86,7 @@ async function getScheduleRegisterFormToken(classHref: string, headers: {}): Pro
 }
 
 
-export async function cancelClassBooking(classHref: string, classId: string, account: Account): Promise<void> {
+export async function unregisterFromClass(classHref: string, classId: string, account: Account): Promise<void> {
     const sessionId = await getSessionId(account.id);
 
     if (!sessionId) {
@@ -97,7 +97,7 @@ export async function cancelClassBooking(classHref: string, classId: string, acc
         Cookie: `${ZDROFIT_SESSION_COOKIE_NAME}=${sessionId}`,
     }
 
-    const token = await getScheduleUnregisterFormToken(classHref, headers);
+    const token = await getClassUnregistrationFormToken(classHref, headers);
 
     const body = new URLSearchParams({
         "schedule_unregister_form[id]": classId,
@@ -105,7 +105,7 @@ export async function cancelClassBooking(classHref: string, classId: string, acc
         "schedule_unregister_form[_token]": token,
     });
 
-    const bookingResponse = await fetch(classHref, {
+    const unregistrationResponse = await fetch(classHref, {
         method: "POST",
         headers: {
             ...headers,
@@ -114,13 +114,13 @@ export async function cancelClassBooking(classHref: string, classId: string, acc
         body,
     });
 
-    if (!bookingResponse.ok) {
-        throw new Error(`Rezerwacja nie powiodła się: ${bookingResponse.status}`);
+    if (!unregistrationResponse.ok) {
+        throw new Error(`Wypisanie z zajęć nie powiodło się: ${unregistrationResponse.status}`);
     }
 }
 
 
-async function getScheduleUnregisterFormToken(classHref: string, headers: {}): Promise<string> {
+async function getClassUnregistrationFormToken(classHref: string, headers: {}): Promise<string> {
     const response = await fetch(classHref, {headers});
 
     if (!response.ok) {
