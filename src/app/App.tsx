@@ -13,6 +13,9 @@ import type {Account} from "../features/account/account.types.ts";
 import {ReservationsScreen} from "../features/reservations/ReservationsScreen.tsx";
 import {getAccountLongName} from "../features/account/account.utils.ts";
 import {useReservations} from "../features/reservations/useReservations.ts";
+import type {Reservation} from "../features/reservations/reservations.types.ts";
+import {getClassUrl} from "../zdrofit/zdrofit.urls.ts";
+import {unregisterFromClass} from "../features/classes/classes.service.ts";
 
 type AppScreen =
     "main-menu" |
@@ -58,7 +61,9 @@ export function App(){
         classes,
         isClassesLoading,
         classesError,
-        toggleClassRegistration
+        toggleClassRegistration,
+        withdrawFromClass,
+        refreshClasses,
     } = useClasses({
         selectedClub: activeClub,
         activeAccount,
@@ -104,6 +109,16 @@ export function App(){
     async function handleDeleteAccount(accountId: string) {
         await deleteAccount(accountId);
         deactivateSession();
+    }
+
+    async function handleWithdrawFromReservation(reservation: Reservation): Promise<void> {
+        const {account, club, classItem} = reservation;
+
+        await withdrawFromClass(classItem, account, club);
+
+        if (activeClub?.id === club.id) {
+            await refreshClasses()
+        }
     }
 
 
@@ -179,6 +194,7 @@ export function App(){
                         reservations={reservations}
                         activeAccount={activeAccountLabel}
                         onReturn={() => navigateTo("main-menu")}
+                        onWithdraw={handleWithdrawFromReservation}
                     />
                 )
         }

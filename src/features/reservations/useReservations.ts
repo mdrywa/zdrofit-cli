@@ -9,7 +9,6 @@ import {
 import type {Club} from "../clubs/clubs.types.ts";
 import type {Class} from "../classes/classes.types.ts";
 
-
 export function useReservations(activeAccount: Account | undefined) {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [reservationsLoading, setReservationsLoading] = useState(true);

@@ -79,7 +79,7 @@ export function useClasses({
                 await withdrawFromClass(classItem, activeAccount, selectedClub);
             }
 
-            await refreshClasses(selectedClub, activeAccount);
+            await refreshClasses();
         }
         catch (error) {
             setClassesError(
@@ -104,9 +104,14 @@ export function useClasses({
         await removeReservation(account, club, classItem);
     }
 
-    async function refreshClasses(club: Club, account: Account): Promise<void> {
-        const clubScheduleUrl = getClubScheduler(club.href);
-        const updatedClasses = await fetchClasses(clubScheduleUrl, account);
+    async function refreshClasses(): Promise<void> {
+        if (!selectedClub) {
+            setClasses([]);
+            return;
+        }
+
+        const clubScheduleUrl = getClubScheduler(selectedClub.href);
+        const updatedClasses = await fetchClasses(clubScheduleUrl, activeAccount);
         setClasses(updatedClasses);
     }
 
@@ -115,5 +120,7 @@ export function useClasses({
         isClassesLoading,
         classesError,
         toggleClassRegistration,
+        withdrawFromClass,
+        refreshClasses,
     };
 }

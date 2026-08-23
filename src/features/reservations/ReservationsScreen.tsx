@@ -8,32 +8,32 @@ import type {Reservation} from "./reservations.types.ts";
 import {colors} from "../../theme/colors.ts";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
 import {getClubLongName} from "../clubs/clubs.utils.ts";
-import type {Account} from "../account/account.types.ts";
-
-
-
 type ReservationsScreenProps = {
     reservations: Reservation[];
     activeAccount: string;
     onReturn: () => void;
+    onWithdraw: (reservation: Reservation) => Promise<void>;
 }
 
 export function ReservationsScreen({
     reservations,
     activeAccount,
     onReturn,
+    onWithdraw,
 }: ReservationsScreenProps) {
 
     const reservationItems = reservations.map(reservation => ({
         id: reservation.id,
         label: `${reservation.classItem.date} ${reservation.classItem.time} | ${reservation.classItem.name} | ${reservation.club.name}`,
-        onSelect: () => {},
+        onSelect: () => onWithdraw(reservation),
     }));
 
     useInput((_input, key) => {
         if (key.escape) {
             onReturn();
         }
+
+
     })
 
     return (
