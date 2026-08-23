@@ -13,6 +13,8 @@ import {getClubLongName} from "../clubs/clubs.utils.ts";
 type ClassesScreenProps = {
     classes: Class[];
     activeClub: Club | undefined;
+    classesLoading: boolean;
+    classesError: string | null;
     onSelect: (oneCLass: Class) => void;
     returnClick: () => void;
 }
@@ -20,6 +22,8 @@ type ClassesScreenProps = {
 export function ClassesScreen({
     classes,
     activeClub,
+    classesLoading,
+    classesError,
     onSelect,
     returnClick,
 }:ClassesScreenProps) {
@@ -73,66 +77,63 @@ export function ClassesScreen({
                 />
             </Box>
 
-            <ClassesTable
-                rows={filteredClasses}
-                columns={[
-                    {
-                        id: "hour",
-                        header: "Godzina",
-                        width: 10,
-                        render: row=> row.time,
-                    },
-                    {
-                        id: "name",
-                        header: "Nazwa",
-                        width: 30,
-                        render: row=> row.name,
-                    },
-                    {
-                        id: "trainer",
-                        header: "Trener",
-                        width: 25,
-                        render: row=> row.trainer,
-                    },
-                    {
-                        id: "status",
-                        header: "Status",
-                        width: 20,
-                        render: row=> row.status,
-                        color: row => {
-                            switch (row.status) {
-                                case "available":
-                                    return colors.status.info;
+            {classesLoading ? <Text color={colors.text.secondary}>Ładowanie zajęć...</Text> : null}
 
-                                case "booked":
-                                    return colors.status.success;
+            {classesError ? <Text color={colors.status.error}>{classesError}</Text> : null}
 
-                                case "fully-booked":
-                                    return colors.status.error;
 
-                                case "too-early":
-                                    return colors.status.warning;
-
-                                case "booking-closed":
-                                case "cancellation-closed":
-                                    return colors.text.muted;
-
-                                default:
-                                    return colors.text.muted;
-                            }
-                        }
-                    },
-                    {
-                        id: "spots",
-                        header: "Miejsca",
-                        width: 10,
-                        render: row=> row.spots,
-                    },
-                ]}
-                getRowId={row => row.id}
-                onSelect={onSelect}
-                isActive={true}
-            />
+            {!classesLoading
+            ? (
+                <ClassesTable
+                    rows={filteredClasses}
+                    columns={[
+                        {
+                            id: "hour",
+                            header: "Godzina",
+                            width: 10,
+                            render: row=> row.time,
+                        },
+                        {
+                            id: "name",
+                            header: "Nazwa",
+                            width: 30,
+                            render: row=> row.name,
+                        },
+                        {
+                            id: "trainer",
+                            header: "Trener",
+                            width: 25,
+                            render: row=> row.trainer,
+                        },
+                        {
+                            id: "status",
+                            header: "Status",
+                            width: 20,
+                            render: row=> row.status,
+                            color: row => {
+                                switch (row.status) {
+                                    case "available":
+                                        return colors.status.info;
+                                        case "booked":return colors.status.success;
+                                        case "fully-booked":return colors.status.error;
+                                        case "too-early":return colors.status.warning;
+                                        case "booking-closed":case "cancellation-closed":return colors.text.muted;
+                                        default:return colors.text.muted;
+                                }
+                            }},
+                        {
+                            id: "spots",
+                            header: "Miejsca",
+                            width: 10,
+                            render: row=> row.spots,
+                        },
+                    ]}
+                    getRowId={row => row.id}
+                    onSelect={onSelect}
+                    isActive={true}
+                />
+                )
+            : null}
 
 
             <Divider/>

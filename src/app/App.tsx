@@ -53,9 +53,13 @@ export function App(){
 
     const {
         reservations,
+        reservationsLoading,
+        reservationsError,
         addReservation,
         removeReservation,
     } = useReservations(activeAccount);
+
+    const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
 
     const {
         classes,
@@ -73,7 +77,7 @@ export function App(){
     })
 
     // Current screen
-    const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
+
 
     function navigateTo(screen: AppScreen): void {
         setCurrentScreen(screen);
@@ -184,6 +188,8 @@ export function App(){
                     <ClassesScreen
                         classes={classes}
                         activeClub={activeClub}
+                        classesLoading={isClassesLoading}
+                        classesError={classesError}
                         onSelect={toggleClassRegistration}
                         returnClick={() => navigateTo("main-menu")}
                     />
@@ -193,6 +199,8 @@ export function App(){
                     <ReservationsScreen
                         reservations={reservations}
                         activeAccount={activeAccountLabel}
+                        reservationLoading={reservationsLoading}
+                        reservationError={reservationsError}
                         onReturn={() => navigateTo("main-menu")}
                         onWithdraw={handleWithdrawFromReservation}
                     />

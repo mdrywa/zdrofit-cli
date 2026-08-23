@@ -26,6 +26,10 @@ export function useClasses({
 
     useEffect(() => {
         async function loadClasses(): Promise<void> {
+            if (isSessionActive === null) {
+                return;
+            }
+
             if (!selectedClub) {
                 setClasses([]);
                 setIsClassesLoading(false);
@@ -51,7 +55,7 @@ export function useClasses({
         }
 
         void loadClasses();
-    }, [selectedClub, activeAccount, isSessionActive]);
+    }, [selectedClub?.id, activeAccount?.id, isSessionActive]);
 
     async function toggleClassRegistration(classItem: Class): Promise<void> {
         if (!activeAccount) {

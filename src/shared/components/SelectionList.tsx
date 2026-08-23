@@ -59,10 +59,11 @@ export function SelectionList({items, maxItems = 10}: SelectionListProps) {
         startIndex + maxItems
     );
 
-
     return (
         <Box flexDirection="column">
-            {visibleItems.map((item, index) => {
+            {items.length === 0
+                ? (<Text dimColor>Brak danych</Text>)
+                : (visibleItems.map((item, index) => {
                 const realIndex = startIndex + index;
                 const isSelected = realIndex === selectedIndex;
 
@@ -76,7 +77,7 @@ export function SelectionList({items, maxItems = 10}: SelectionListProps) {
                         {item.label}
                     </Text>
                 )
-            })}
+            }))}
         </Box>
     )
 }
