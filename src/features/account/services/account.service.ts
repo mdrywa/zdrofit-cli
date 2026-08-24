@@ -1,7 +1,11 @@
 import type {Account, AccountInput} from "../account.types.ts";
 import {getAccounts, saveAccounts} from "../account.repository.ts";
 import {deletePassword, deleteSessionId, savePassword} from "./auth.service.ts";
+import { createHash } from "crypto";
 
+function createAccountId(email: string): string {
+    return createHash("sha256").update(email).digest("hex");
+}
 
 export async function createAccount(input: AccountInput): Promise<Account> {
     const name = input.name.trim();
@@ -31,7 +35,7 @@ export async function createAccount(input: AccountInput): Promise<Account> {
 
     const now = new Date().toISOString();
     const account: Account = {
-        id: crypto.randomUUID(),
+        id: createAccountId(email),
         name,
         email,
         isActive: accounts.length === 0,

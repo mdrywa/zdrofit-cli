@@ -118,6 +118,8 @@ export function App(){
     async function handleWithdrawFromReservation(reservation: Reservation): Promise<void> {
         const {account, club, classItem} = reservation;
 
+
+
         await withdrawFromClass(classItem, account, club);
 
         if (activeClub?.id === club.id) {
