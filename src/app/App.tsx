@@ -57,9 +57,10 @@ export function App(){
         reservationsError,
         addReservation,
         removeReservation,
+        reportReservationsError
     } = useReservations(activeAccount);
 
-    const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
+
 
     const {
         classes,
@@ -77,7 +78,7 @@ export function App(){
     })
 
     // Current screen
-
+    const [currentScreen, setCurrentScreen] = useState<AppScreen>("main-menu");
 
     function navigateTo(screen: AppScreen): void {
         setCurrentScreen(screen);
@@ -116,15 +117,19 @@ export function App(){
     }
 
     async function handleWithdrawFromReservation(reservation: Reservation): Promise<void> {
-        const {account, club, classItem} = reservation;
+        try {
+            const {account, club, classItem} = reservation;
 
+            await withdrawFromClass(classItem, account, club);
 
-
-        await withdrawFromClass(classItem, account, club);
-
-        if (activeClub?.id === club.id) {
-            await refreshClasses()
+            if (activeClub?.id === club.id) {
+                await refreshClasses()
+            }
         }
+        catch (error) {
+            reportReservationsError(error);
+        }
+
     }
 
 

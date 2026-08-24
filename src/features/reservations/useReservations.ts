@@ -106,6 +106,14 @@ export function useReservations(activeAccount: Account | undefined) {
         setReservations(loadedReservations);
     }
 
+    function reportReservationsError(error: unknown) {
+        setReservationsError(
+            error instanceof Error
+                ? error.message
+                : "Nie udało się wykonać operacji na rezerwacji"
+        );
+    }
+
 
     return {
         reservations,
@@ -113,6 +121,7 @@ export function useReservations(activeAccount: Account | undefined) {
         reservationsError,
         addReservation,
         removeReservation,
+        reportReservationsError,
     }
 }
 
