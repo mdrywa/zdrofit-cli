@@ -5,7 +5,7 @@ import {Divider} from "../../shared/components/Divider.tsx";
 import {NavigationHints} from "../../shared/components/NavigationHints.tsx";
 import type {Class} from "./classes.types.ts";
 import {colors} from "../../theme/colors.ts";
-import {ClassesTable} from "./components/ClassesTable.tsx";
+import {SelectableTable} from "../../shared/components/Table/SelectableTable.tsx";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
 import type {Club} from "../clubs/clubs.types.ts";
 import {getClubLongName} from "../clubs/clubs.utils.ts";
@@ -84,7 +84,7 @@ export function ClassesScreen({
 
             {!classesLoading
             ? (
-                <ClassesTable
+                <SelectableTable
                     rows={filteredClasses}
                     columns={[
                         {

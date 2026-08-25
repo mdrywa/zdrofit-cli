@@ -7,6 +7,7 @@ import {SelectionList} from "../../shared/components/SelectionList.tsx";
 import type {Reservation} from "./reservations.types.ts";
 import {colors} from "../../theme/colors.ts";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
+import {SelectableTable} from "../../shared/components/Table/SelectableTable.tsx";
 type ReservationsScreenProps = {
     reservations: Reservation[];
     activeAccount: string;
@@ -24,12 +25,6 @@ export function ReservationsScreen({
     onReturn,
     onWithdraw,
 }: ReservationsScreenProps) {
-
-    const reservationItems = reservations.map(reservation => ({
-        id: reservation.id,
-        label: `${reservation.classItem.date} ${reservation.classItem.time} | ${reservation.classItem.name} | ${reservation.club.name}`,
-        onSelect: () => onWithdraw(reservation),
-    }));
 
     useInput((_input, key) => {
         if (key.escape) {
@@ -62,9 +57,53 @@ export function ReservationsScreen({
 
             {!reservationLoading
             ? (
-                <SelectionList
-                    items={reservationItems}
-                />
+                <SelectableTable
+                    rows={reservations}
+                    columns={[
+                        {
+                            id: "hour",
+                            header: "Godzina",
+                            width: 10,
+                            render: row=> row.classItem.time,
+                        },
+                        {
+                            id: "date",
+                            header: "Data",
+                            width: 15,
+                            render: row=> row.classItem.date,
+                        },
+                        {
+                            id: "club",
+                            header: "Klub",
+                            width: 20,
+                            render: row=> row.club.name,
+                        },
+                        {
+                            id: "name",
+                            header: "Nazwa",
+                            width: 30,
+                            render: row=> row.classItem.name,
+                        },
+                        {
+                            id: "status",
+                            header: "Status",
+                            width: 20,
+                            render: row=> row.classItem.status,
+                            color: row => {
+                                switch (row.classItem.status) {
+                                    case "available":
+                                        return colors.status.info;
+                                    case "booked":return colors.status.success;
+                                    case "fully-booked":return colors.status.error;
+                                    case "too-early":return colors.status.warning;
+                                    case "booking-closed":case "cancellation-closed":return colors.text.muted;
+                                    default:return colors.text.muted;
+                                }
+                            }}
+                    ]}
+                    getRowId={row => row.id}
+                    onSelect={onWithdraw}
+                    isActive={true}/>
                 )
             : null}
 

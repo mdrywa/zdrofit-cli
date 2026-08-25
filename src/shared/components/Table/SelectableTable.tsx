@@ -20,7 +20,7 @@ type ClassesTablePops<T> = {
     isActive: boolean;
 }
 
-export function ClassesTable<T>({
+export function SelectableTable<T>({
     rows,
     columns,
     getRowId,

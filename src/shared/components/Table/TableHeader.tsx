@@ -1,5 +1,5 @@
 import React from "react";
-import type {TableColumn} from "./ClassesTable.tsx";
+import type {TableColumn} from "./SelectableTable.tsx";
 import {Box, Text} from "ink";
 
 type TableHeaderProps<T> = {
