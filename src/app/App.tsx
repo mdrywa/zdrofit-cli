@@ -58,7 +58,7 @@ export function App(){
         addReservation,
         removeReservation,
         reportReservationsError
-    } = useReservations(activeAccount);
+    } = useReservations(activeAccount, isSessionActive === true);
 
 
 

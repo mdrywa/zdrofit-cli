@@ -2,19 +2,25 @@ import {useEffect, useState} from "react";
 import type {Reservation} from "./reservations.types.ts";
 import type {Account} from "../account/account.types.ts";
 import {
-    addSavedReservation,
+    addSavedReservation, buildReservation,
     getSavedReservations,
     removeSavedReservation,
+    synchronizeSavedReservations,
 } from "./reservations.service.ts";
 import type {Club} from "../clubs/clubs.types.ts";
 import type {Class} from "../classes/classes.types.ts";
 
-export function useReservations(activeAccount: Account | undefined) {
+export function useReservations(
+    activeAccount: Account | undefined,
+    isSessionActive: boolean,
+) {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [reservationsLoading, setReservationsLoading] = useState(true);
     const [reservationsError, setReservationsError] = useState<string | null>(null);
 
     useEffect(() => {
+        let cancelled = false;
+
         async function loadReservations(): Promise<void> {
             if (!activeAccount) {
                 setReservations([]);
@@ -30,33 +36,40 @@ export function useReservations(activeAccount: Account | undefined) {
                 const loadedReservations = (await getSavedReservations()).filter(
                     reservation => reservation.account.id === activeAccount.id,
                 );
-                setReservations(loadedReservations);
+
+                if (!cancelled) {
+                    setReservations(loadedReservations);
+                }
+
+                if (isSessionActive) {
+                    const synchronizedReservations =
+                        await synchronizeSavedReservations(activeAccount);
+
+                    if (!cancelled) {
+                        setReservations(synchronizedReservations);
+                    }
+                }
             }
             catch (error) {
-                setReservationsError(error instanceof Error
-                    ? error.message
-                    : "Nie udało się pobrać rezerwacji");
+                if (!cancelled) {
+                    setReservationsError(error instanceof Error
+                        ? error.message
+                        : "Nie udało się pobrać rezerwacji");
+                }
             }
             finally {
-                setReservationsLoading(false);
+                if (!cancelled) {
+                    setReservationsLoading(false);
+                }
             }
         }
 
         void loadReservations();
-    }, [activeAccount?.id]);
 
-    function buildReservation(account: Account, club: Club, classItem: Class): Reservation {
-        return {
-            id: `${account.id}:${club.id}:${classItem.id}`,
-            account,
-            club,
-            classItem: {
-                ...classItem,
-                canBook: false,
-                status: "booked",
-            },
+        return () => {
+            cancelled = true;
         };
-    }
+    }, [activeAccount?.id, isSessionActive]);
 
     async function addReservation(account: Account, club: Club, classItem: Class): Promise<void> {
         setReservationsError(null);
