@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import type {Club} from "./clubs.types.ts";
-import {getClubs} from "./clubs.service.ts";
-import {getActiveClub, saveActiveClub} from "./clubs.repository.ts";
+import {fetchClubs, getActiveClub, saveActiveClub} from "./clubs.service.ts";
 
 
 export function useClubs() {
@@ -19,7 +18,7 @@ export function useClubs() {
                 const savedClub = await getActiveClub();
                 setActiveClub(savedClub);
 
-                const loadedClubs = await getClubs();
+                const loadedClubs = await fetchClubs();
                 setClubs(loadedClubs);
 
                 if (savedClub) {

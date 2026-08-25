@@ -1,9 +1,18 @@
 import type {Club} from "./clubs.types.ts";
 import * as cheerio from "cheerio";
 import {ZDROFIT_URLS} from "../../zdrofit/zdrofit.urls.ts";
+import {getStoredActiveClub, setActiveClub} from "./clubs.repository.ts";
 
 
-export async function getClubs(): Promise<Club[]> {
+export async function getActiveClub(): Promise<Club | undefined> {
+    return await getStoredActiveClub();
+}
+
+export async function saveActiveClub(club: Club): Promise<void> {
+    await setActiveClub(club);
+}
+
+export async function fetchClubs(): Promise<Club[]> {
     const response = await fetch(ZDROFIT_URLS.clubs);
 
     if (!response.ok) {

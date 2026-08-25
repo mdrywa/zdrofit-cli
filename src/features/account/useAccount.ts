@@ -1,9 +1,8 @@
 import {useEffect, useState} from "react";
 import type {Account, AccountInput} from "./account.types.ts";
-import {getAccounts} from "./account.repository.ts";
 import {
     createAccount,
-    deleteAccount as deleteAccountService,
+    deleteAccount as deleteAccountService, getAccounts,
     switchAccount as switchAccountService,
 } from "./services/account.service.ts";
 import {checkSession, login} from "./services/auth.service.ts";

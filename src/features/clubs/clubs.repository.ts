@@ -13,7 +13,7 @@ function getClubSettingsPath(): string {
     return join(getAppDataDir(), CLUBS_SETTINGS_FILE_NAME);
 }
 
-export async function getActiveClub(): Promise<Club | undefined> {
+export async function getStoredActiveClub(): Promise<Club | undefined> {
     try {
         const content = await readFile(getClubSettingsPath(), "utf-8");
         const settings = JSON.parse(content) as ClubSettings;
@@ -30,7 +30,7 @@ export async function getActiveClub(): Promise<Club | undefined> {
 }
 
 
-export async function saveActiveClub(club: Club): Promise<void> {
+export async function setActiveClub(club: Club): Promise<void> {
     await mkdir(getAppDataDir(), { recursive: true });
 
     await writeFile(

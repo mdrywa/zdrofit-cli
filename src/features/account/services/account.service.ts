@@ -1,7 +1,12 @@
 import type {Account, AccountInput} from "../account.types.ts";
-import {getAccounts, saveAccounts} from "../account.repository.ts";
+import {getStoredAccounts, saveAccounts} from "../account.repository.ts";
 import {deletePassword, deleteSessionId, savePassword} from "./auth.service.ts";
 import { createHash } from "crypto";
+
+
+export async function getAccounts(): Promise<Account[]> {
+    return await getStoredAccounts();
+}
 
 function createAccountId(email: string): string {
     return createHash("sha256").update(email).digest("hex");
@@ -23,7 +28,7 @@ export async function createAccount(input: AccountInput): Promise<Account> {
         throw new Error("Password cannot be empty");
     }
 
-    const accounts = await getAccounts();
+    const accounts = await getStoredAccounts();
 
     const accountAlreadyExists = accounts.some(
         account => account.email.toLowerCase() === email,
@@ -64,7 +69,7 @@ export async function createAccount(input: AccountInput): Promise<Account> {
 
 
 export async function deleteAccount(accountId: string): Promise<void> {
-    const accounts = await getAccounts();
+    const accounts = await getStoredAccounts();
 
     const accountToDelete = accounts.find(account => account.id === accountId);
 
@@ -86,7 +91,7 @@ export async function deleteAccount(accountId: string): Promise<void> {
 }
 
 export async function switchAccount(accountId: string): Promise<void> {
-    const accounts = await getAccounts();
+    const accounts = await getStoredAccounts();
     const accountExists = accounts.some(account => account.id === accountId);
 
     if (!accountExists) {

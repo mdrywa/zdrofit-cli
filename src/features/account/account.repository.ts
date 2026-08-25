@@ -9,7 +9,7 @@ function getAccountsFilePath(): string {
     return join(getAppDataDir(), ACCOUNTS_FILE_NAME);
 }
 
-export async function getAccounts(): Promise<Account[]> {
+export async function getStoredAccounts(): Promise<Account[]> {
     try {
         const fileContent = await readFile(getAccountsFilePath(), "utf-8");
 
