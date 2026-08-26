@@ -8,15 +8,10 @@ import {ZDROFIT_SESSION_COOKIE_NAME} from "../../zdrofit/zdrofit.constants.ts";
 export async function fetchClasses(clubScheduleUrl: string, account?: Account): Promise<Class[]> {
     const headers: Record<string, string> = {};
 
-    if (account) {
-        const sessionId = await getSessionId(account.id);
+    const sessionId = account ? await getSessionId(account.id) : null;
 
-        if (!sessionId) {
-            throw new Error("Brak aktywnej sesji zalogowanego konta");
-        }
-
+    if (sessionId)
         headers.Cookie = `${ZDROFIT_SESSION_COOKIE_NAME}=${sessionId}`;
-    }
 
     const response = await fetch(clubScheduleUrl, {
         headers,

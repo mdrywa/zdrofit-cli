@@ -41,7 +41,7 @@ export function useClasses({
                 setClassesError(null);
 
                 const clubScheduleUrl = getClubScheduler(selectedClub.href);
-                const loadedClasses = await fetchClasses(clubScheduleUrl, activeAccount);
+                const loadedClasses = await fetchClasses(clubScheduleUrl, isSessionActive ? activeAccount : undefined);
                 setClasses(loadedClasses);
             }
             catch (error) {

@@ -43,7 +43,13 @@ export async function checkSession(account: Account): Promise<boolean> {
     }
 
     try {
-        return await checkSessionInBrowser(sessionId);
+        const isActive = await checkSessionInBrowser(sessionId);
+
+        if (!isActive) {
+            await deleteSessionId(account.id);
+        }
+
+        return isActive;
     }
     catch (error: unknown) {
         throw new Error(`Nie udało się sprawdzić sesji: ${getErrorMessage(error)}`, {
