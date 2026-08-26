@@ -7,6 +7,7 @@ import {Divider} from "../../../shared/components/Divider.tsx";
 import {NavigationHints} from "../../../shared/components/NavigationHints.tsx";
 import type {AccountInput} from "../account.types.ts";
 import {RegisterForm} from "../components/RegisterForm.tsx";
+import {useTranslations} from "../../../i18n/useTranslations.ts";
 
 type NewAccountScreenProps = {
     activeAccount: string;
@@ -23,6 +24,8 @@ export function NewAccountScreen({
     returnClick,
     onSubmit
 }: NewAccountScreenProps) {
+    const {messages} = useTranslations();
+    const text = messages.screens.newAccount;
 
 
     useInput((_input, key) => {
@@ -42,7 +45,7 @@ export function NewAccountScreen({
 
     return (
         <Box flexDirection={"column"}>
-            <ScreenLogo screenName={"Nowe konto"}/>
+            <ScreenLogo screenName={text.title}/>
 
             <Box
                 flexDirection={"row"}
@@ -52,8 +55,8 @@ export function NewAccountScreen({
                 borderStyle={"round"}
                 borderColor={colors.border.active}
             >
-                <SettingRow label={"Konto"} value={activeAccount} />
-                <SettingRow label={"Sesja"} value={sessionActive} />
+                <SettingRow label={messages.common.labels.account} value={activeAccount} />
+                <SettingRow label={messages.common.labels.session} value={sessionActive} />
             </Box>
 
             {error ? <Text color={colors.status.error}>{error}</Text> : null}
@@ -63,9 +66,9 @@ export function NewAccountScreen({
             <Divider/>
             <NavigationHints
                 hints={[
-                    {key: "↑↓/Tab", label: "wybierz"},
-                    {key: "Enter", label: "zatwierdź"},
-                    {key: "ESC", label: "cofnij"},
+                    {key: "↑↓/Tab", label: messages.common.actions.select},
+                    {key: "Enter", label: messages.common.actions.confirm},
+                    {key: "ESC", label: messages.common.actions.goBack},
                 ]}
             />
         </Box>

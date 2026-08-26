@@ -8,6 +8,7 @@ import {SelectionList} from "../../../shared/components/SelectionList.tsx";
 import {ScreenLogo} from "../../../shared/components/ScreenLogo.tsx";
 import type {Account} from "../account.types.ts";
 import {getAccountLongName} from "../account.utils.ts";
+import {useTranslations} from "../../../i18n/useTranslations.ts";
 
 
 export type AccountScreenProps = {
@@ -34,6 +35,8 @@ export function AccountsScreen({
     accountChangeClick,
     deleteAccountClick
 }: AccountScreenProps) {
+    const {messages} = useTranslations();
+    const text = messages.screens.accounts;
 
     useInput((_input, key)=>{
         if (key.escape){
@@ -43,7 +46,7 @@ export function AccountsScreen({
 
     return (
         <Box flexDirection={"column"}>
-            <ScreenLogo screenName={"Konta"}/>
+            <ScreenLogo screenName={text.title}/>
 
             <Box
                 flexDirection={"row"}
@@ -53,11 +56,11 @@ export function AccountsScreen({
                 borderStyle={"round"}
                 borderColor={colors.border.active}
             >
-                <SettingRow label={"Konto"} value={activeAccount} />
-                <SettingRow label={"Sesja"} value={sessionActive} />
+                <SettingRow label={messages.common.labels.account} value={activeAccount} />
+                <SettingRow label={messages.common.labels.session} value={sessionActive} />
             </Box>
 
-            {isLoading ? <Text color={colors.text.secondary}>Ładowanie kont...</Text> : null}
+            {isLoading ? <Text color={colors.text.secondary}>{text.loading}</Text> : null}
 
             {error ? <Text color={colors.status.error}>{error}</Text> : null}
 
@@ -66,12 +69,12 @@ export function AccountsScreen({
                     items={[
                         {
                             id: "new-account",
-                            label: "+ Dodaj nowe konto",
+                            label: `+ ${text.addAccount}`,
                             onSelect: newAccountClick,
                         },
                         ...accounts.map(account => ({
                             id: account.id,
-                            label: `${getAccountLongName(account)}${account.isActive ? " (aktywne)" : ""}`,
+                            label: `${getAccountLongName(account)}${account.isActive ? ` (${text.activeIndicator})` : ""}`,
                             onSelect: () => {
                                 void accountChangeClick(account.id).catch(() => undefined);
                             },
@@ -86,10 +89,10 @@ export function AccountsScreen({
             <Divider/>
             <NavigationHints
                 hints={[
-                    {key: "↑↓", label: "wybierz"},
-                    {key: "Enter", label: "zatwierdź"},
-                    {key: "Delete", label: "usuń"},
-                    {key: "ESC", label: "cofnij"},
+                    {key: "↑↓", label: messages.common.actions.select},
+                    {key: "Enter", label: messages.common.actions.confirm},
+                    {key: "Delete", label: messages.common.actions.delete},
+                    {key: "ESC", label: messages.common.actions.goBack},
                 ]}
             />
         </Box>

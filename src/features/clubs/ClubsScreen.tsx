@@ -12,6 +12,7 @@ import {colors} from "../../theme/colors.ts";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
 import {getClubLongName} from "./clubs.utils.ts";
 import {clubToSelectionListItem} from "./clubs.mappers.ts";
+import {useTranslations} from "../../i18n/useTranslations.ts";
 
 type ClubsScreenProps = {
     clubs: Club[];
@@ -32,6 +33,8 @@ export function ClubsScreen(
         clubSelectClick,
     }: ClubsScreenProps
 ) {
+    const {messages} = useTranslations();
+    const text = messages.screens.clubs;
     const clubItems = clubs.map(club =>
         clubToSelectionListItem(club, clubSelectClick),
     );
@@ -44,7 +47,7 @@ export function ClubsScreen(
 
     return (
         <Box flexDirection={"column"}>
-            <ScreenLogo screenName={"Kluby"}/>
+            <ScreenLogo screenName={text.title}/>
 
             <Box
                 flexDirection={"row"}
@@ -55,14 +58,14 @@ export function ClubsScreen(
                 borderColor={colors.border.active}
             >
                 <SettingRow
-                    label={"Klub"}
+                    label={messages.common.labels.club}
                     value={activeClub
                     ? getClubLongName(activeClub)
-                    : "Brak wybranego klubu"}
+                    : messages.common.emptyState.noSelectedClub}
                 />
             </Box>
 
-            {isLoading ? (<Text color={colors.text.secondary}>Pobieranie klubów ...</Text>) : null}
+            {isLoading ? (<Text color={colors.text.secondary}>{text.loading}</Text>) : null}
             {error ? (<Text color={colors.status.error}>{error}</Text>) : null}
 
             {!isLoading ? (<SelectionList items={clubItems} maxItems={10}/>) : null}
@@ -71,9 +74,9 @@ export function ClubsScreen(
             <Divider/>
             <NavigationHints
                 hints={[
-                    {key: "↑↓", label: "wybierz zajecia"},
-                    {key: "Enter", label: "zatwierdź"},
-                    {key: "ESC", label: "cofnij"},
+                    {key: "↑↓", label: text.selectClub},
+                    {key: "Enter", label: messages.common.actions.confirm},
+                    {key: "ESC", label: messages.common.actions.goBack},
                 ]}
             />
         </Box>

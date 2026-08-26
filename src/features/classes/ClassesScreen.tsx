@@ -9,6 +9,7 @@ import {SelectableTable} from "../../shared/components/Table/SelectableTable.tsx
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
 import type {Club} from "../clubs/clubs.types.ts";
 import {getClubLongName} from "../clubs/clubs.utils.ts";
+import {useTranslations} from "../../i18n/useTranslations.ts";
 
 type ClassesScreenProps = {
     classes: Class[];
@@ -27,6 +28,8 @@ export function ClassesScreen({
     onSelect,
     returnClick,
 }:ClassesScreenProps) {
+    const {messages} = useTranslations();
+    const text = messages.screens.classes;
 
     const avaliableDates = useMemo(() =>
         [...new Set(classes.map(oneClass => oneClass.date))].sort(),
@@ -54,7 +57,7 @@ export function ClassesScreen({
 
     return (
         <Box flexDirection="column">
-            <ScreenLogo screenName={"Zajęcia"}/>
+            <ScreenLogo screenName={text.title}/>
 
             <Box
                 flexDirection={"row"}
@@ -65,19 +68,19 @@ export function ClassesScreen({
                 borderColor={colors.border.active}
             >
                 <SettingRow
-                    label={"Klub"}
+                    label={messages.common.labels.club}
                     value={activeClub
                         ? getClubLongName(activeClub)
-                        : "Brak wybranego klubu"}
+                        : messages.common.emptyState.noSelectedClub}
                 />
 
                 <SettingRow
-                    label={"Data"}
+                    label={messages.common.labels.date}
                     value={`◀ ${avaliableDates[dateIndex]} ▶`}
                 />
             </Box>
 
-            {classesLoading ? <Text color={colors.text.secondary}>Ładowanie zajęć...</Text> : null}
+            {classesLoading ? <Text color={colors.text.secondary}>{text.loading}</Text> : null}
 
             {classesError ? <Text color={colors.status.error}>{classesError}</Text> : null}
 
@@ -89,27 +92,27 @@ export function ClassesScreen({
                     columns={[
                         {
                             id: "hour",
-                            header: "Godzina",
+                            header: messages.common.labels.time,
                             width: 10,
                             render: row=> row.time,
                         },
                         {
                             id: "name",
-                            header: "Nazwa",
+                            header: messages.common.labels.name,
                             width: 30,
                             render: row=> row.name,
                         },
                         {
                             id: "trainer",
-                            header: "Trener",
+                            header: text.columns.trainer,
                             width: 25,
                             render: row=> row.trainer,
                         },
                         {
                             id: "status",
-                            header: "Status",
+                            header: messages.common.labels.status,
                             width: 20,
-                            render: row=> row.status,
+                            render: row => messages.common.classStatuses[row.status],
                             color: row => {
                                 switch (row.status) {
                                     case "available":
@@ -123,7 +126,7 @@ export function ClassesScreen({
                             }},
                         {
                             id: "spots",
-                            header: "Miejsca",
+                            header: text.columns.spots,
                             width: 10,
                             render: row=> row.spots,
                         },
@@ -139,10 +142,10 @@ export function ClassesScreen({
             <Divider/>
             <NavigationHints
                 hints={[
-                    {key: "←→", label: "wybierz datę"},
-                    {key: "↑↓", label: "wybierz zajęcia"},
-                    {key: "Enter", label: "zatwierdź"},
-                    {key: "ESC", label: "cofnij"},
+                    {key: "←→", label: text.selectDate},
+                    {key: "↑↓", label: text.selectClass},
+                    {key: "Enter", label: messages.common.actions.confirm},
+                    {key: "ESC", label: messages.common.actions.goBack},
                 ]}
             />
         </Box>

@@ -8,6 +8,7 @@ import {SelectionList} from "../../shared/components/SelectionList.tsx";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
 import type {Club} from "../../features/clubs/clubs.types.ts";
 import {getClubShortName} from "../../features/clubs/clubs.utils.ts";
+import {useTranslations} from "../../i18n/useTranslations.ts";
 
 type MainMenuScreenProps = {
     activeAccount: string;
@@ -34,6 +35,9 @@ export function MainMenuScreen({
     onReservationsClick,
     onExit,
 }: MainMenuScreenProps): React.ReactElement {
+    const {messages} = useTranslations();
+    const text = messages.screens.mainMenu;
+
     useInput((input) => {
         if (input.toLowerCase() === "a") {
             onAccountClick();
@@ -58,24 +62,24 @@ export function MainMenuScreen({
 
             <Box flexDirection="column" marginTop={1} paddingX={1} borderStyle="round" borderColor={colors.border.active}>
                 <SettingRow
-                    label={"Konto"}
+                    label={messages.common.labels.account}
                     value={activeAccount}
                     shortcut={"A"}
-                    actionLabel={"zmień"}
+                    actionLabel={messages.common.actions.change}
                 />
                 <SettingRow
-                    label={"Klub"}
+                    label={messages.common.labels.club}
                     value={activeClub
                         ? getClubShortName(activeClub)
-                        : "Brak wybranego klubu"}
+                        : messages.common.emptyState.noSelectedClub}
                     shortcut={"C"}
-                    actionLabel={"zmień"}
+                    actionLabel={messages.common.actions.change}
                 />
                 <SettingRow
-                    label={"Sesja"}
+                    label={messages.common.labels.session}
                     value={sessionActive}
                     shortcut={"R"}
-                    actionLabel={"odśwież"}
+                    actionLabel={messages.common.actions.refresh}
                 />
             </Box>
 
@@ -89,18 +93,18 @@ export function MainMenuScreen({
                 items={[
                 {
                     id: "classes",
-                    label: "Przeglądaj zajęcia",
+                    label: text.browseClasses,
                     onSelect: onClassesClick,
                 },
                 {
                     id: "reservations",
-                    label: "Zaplanowane rezerwacje",
+                    label: text.scheduledReservations,
                     onSelect: onReservationsClick,
                 },
                 {
                     id: "settings",
-                    label: "Ustawienia",
-                    onSelect: () => console.log("Ustawienia"),
+                    label: text.settings,
+                    onSelect: () => console.log(text.settings),
                 },
             ]}
             />
@@ -109,12 +113,12 @@ export function MainMenuScreen({
 
             <NavigationHints
                 hints={[
-                    {key: "↑↓", label: "wybierz"},
-                    {key: "Enter", label: "otwórz"},
-                    {key: "A", label: "konto"},
-                    {key: "C", label: "klub"},
-                    {key: "R", label: "odśwież sesję"},
-                    {key: "Q", label: "wyjdź"},
+                    {key: "↑↓", label: messages.common.actions.select},
+                    {key: "Enter", label: messages.common.actions.open},
+                    {key: "A", label: messages.common.labels.account},
+                    {key: "C", label: messages.common.labels.club},
+                    {key: "R", label: text.refreshSession},
+                    {key: "Q", label: messages.common.actions.exit},
                 ]}
             />
         </Box>

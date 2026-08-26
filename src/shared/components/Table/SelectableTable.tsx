@@ -2,6 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {Box, Text, useInput} from "ink";
 import {TableHeader} from "./TableHeader.tsx";
 import {TableRow} from "./TableRow.tsx";
+import {useTranslations} from "../../../i18n/useTranslations.ts";
 
 export type TableColumn<T> = {
     id: string;
@@ -28,6 +29,7 @@ export function SelectableTable<T>({
     onDelete,
     isActive,
 }: ClassesTablePops<T>) {
+    const {messages} = useTranslations();
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     useEffect(() => {
@@ -75,7 +77,7 @@ export function SelectableTable<T>({
             <TableHeader columns={columns}/>
 
             {rows.length === 0 ?
-                (<Text dimColor>Brak danych</Text>) :
+                (<Text dimColor>{messages.common.emptyState.noData}</Text>) :
                 (
                     rows.map((row, index) => (
                         <TableRow key={getRowId(row)} row={row} columns={columns} isSelected={isActive && index === selectedIndex}/>

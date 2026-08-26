@@ -3,11 +3,11 @@ import {Box, Text, useInput} from "ink";
 import {ScreenLogo} from "../../shared/components/ScreenLogo.tsx";
 import {NavigationHints} from "../../shared/components/NavigationHints.tsx";
 import {Divider} from "../../shared/components/Divider.tsx";
-import {SelectionList} from "../../shared/components/SelectionList.tsx";
 import type {Reservation} from "./reservations.types.ts";
 import {colors} from "../../theme/colors.ts";
 import {SettingRow} from "../../shared/components/SettingRow.tsx";
 import {SelectableTable} from "../../shared/components/Table/SelectableTable.tsx";
+import {useTranslations} from "../../i18n/useTranslations.ts";
 type ReservationsScreenProps = {
     reservations: Reservation[];
     activeAccount: string;
@@ -25,6 +25,8 @@ export function ReservationsScreen({
     onReturn,
     onWithdraw,
 }: ReservationsScreenProps) {
+    const {messages} = useTranslations();
+    const text = messages.screens.reservations;
 
     useInput((_input, key) => {
         if (key.escape) {
@@ -36,7 +38,7 @@ export function ReservationsScreen({
 
     return (
         <Box flexDirection={"column"}>
-            <ScreenLogo screenName={"Rezerwacje"}/>
+            <ScreenLogo screenName={text.title}/>
             <Box
                 flexDirection={"row"}
                 justifyContent={"space-between"}
@@ -46,12 +48,12 @@ export function ReservationsScreen({
                 borderColor={colors.border.active}
             >
                 <SettingRow
-                    label={"Konto"}
+                    label={messages.common.labels.account}
                     value={activeAccount}
                 />
             </Box>
 
-            {reservationLoading ? <Text color={colors.text.secondary}>Ładowanie rezerwacji...</Text> : null}
+            {reservationLoading ? <Text color={colors.text.secondary}>{text.loading}</Text> : null}
 
             {reservationError ? <Text color={colors.status.error}>{reservationError}</Text> : null}
 
@@ -62,42 +64,41 @@ export function ReservationsScreen({
                     columns={[
                         {
                             id: "hour",
-                            header: "Godzina",
+                            header: messages.common.labels.time,
                             width: 10,
                             render: row=> row.classItem.time,
                         },
                         {
                             id: "date",
-                            header: "Data",
+                            header: messages.common.labels.date,
                             width: 15,
                             render: row=> row.classItem.date,
                         },
                         {
                             id: "club",
-                            header: "Klub",
+                            header: messages.common.labels.club,
                             width: 20,
                             render: row=> row.club.name,
                         },
                         {
                             id: "name",
-                            header: "Nazwa",
+                            header: messages.common.labels.name,
                             width: 30,
                             render: row=> row.classItem.name,
                         },
                         {
                             id: "status",
-                            header: "Status",
+                            header: messages.common.labels.status,
                             width: 20,
-                            render: row=> row.classItem.status,
+                            render: row => messages.common.classStatuses[row.classItem.status],
                             color: row => {
                                 switch (row.classItem.status) {
-                                    case "available":
-                                        return colors.status.info;
-                                    case "booked":return colors.status.success;
-                                    case "fully-booked":return colors.status.error;
-                                    case "too-early":return colors.status.warning;
-                                    case "booking-closed":case "cancellation-closed":return colors.text.muted;
-                                    default:return colors.text.muted;
+                                    case "available": return colors.status.info;
+                                    case "booked": return colors.status.success;
+                                    case "fully-booked": return colors.status.error;
+                                    case "too-early": return colors.status.warning;
+                                    case "booking-closed":case "cancellation-closed": return colors.text.muted;
+                                    default: return colors.text.muted;
                                 }
                             }}
                     ]}
@@ -111,9 +112,9 @@ export function ReservationsScreen({
             <Divider/>
             <NavigationHints
                 hints={[
-                    {key: "↑↓", label: "wybierz rezerwację"},
-                    {key: "Enter", label: "Anuluj rezerwację"},
-                    {key: "ESC", label: "cofnij"},
+                    {key: "↑↓", label: text.selectReservation},
+                    {key: "Enter", label: text.cancelReservation},
+                    {key: "ESC", label: messages.common.actions.goBack},
                 ]}
             />
         </Box>

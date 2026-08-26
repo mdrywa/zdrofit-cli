@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Box, Text, useInput} from "ink";
 import {colors} from "../../theme/colors.ts";
+import {useTranslations} from "../../i18n/useTranslations.ts";
 
 export type SelectionListItem = {
     id: string;
@@ -15,6 +16,7 @@ type SelectionListProps = {
 }
 
 export function SelectionList({items, maxItems = 10}: SelectionListProps) {
+    const {messages} = useTranslations();
     const [selectedIndex, setSelectedIndex] = useState(0)
 
     useEffect(() => {
@@ -62,7 +64,7 @@ export function SelectionList({items, maxItems = 10}: SelectionListProps) {
     return (
         <Box flexDirection="column">
             {items.length === 0
-                ? (<Text dimColor>Brak danych</Text>)
+                ? (<Text dimColor>{messages.common.emptyState.noData}</Text>)
                 : (visibleItems.map((item, index) => {
                 const realIndex = startIndex + index;
                 const isSelected = realIndex === selectedIndex;

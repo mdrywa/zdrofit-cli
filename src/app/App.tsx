@@ -16,6 +16,7 @@ import {useReservations} from "../features/reservations/useReservations.ts";
 import type {Reservation} from "../features/reservations/reservations.types.ts";
 import {getClassUrl} from "../zdrofit/zdrofit.urls.ts";
 import {unregisterFromClass} from "../features/classes/classes.service.ts";
+import {useTranslations} from "../i18n/useTranslations.ts";
 
 type AppScreen =
     "main-menu" |
@@ -28,6 +29,7 @@ type AppScreen =
 export function App(){
     // Exit app function
     const {exit} = useApp();
+    const {messages} = useTranslations();
     const {
         accounts,
         activeAccount,
@@ -86,15 +88,15 @@ export function App(){
 
     const activeAccountLabel = activeAccount
         ? `${getAccountLongName(activeAccount)}`
-        : "Brak aktywnego konta";
+        : messages.common.emptyState.noActiveAccount;
 
     const sessionStatus = isCheckingSession
-        ? "Sprawdzanie..."
+        ? messages.common.sessionStatus.checking
         : isRefreshingSession
-            ? "Odświeżanie..."
+            ? messages.common.sessionStatus.refreshing
             : isSessionActive
-                ? "Aktywna"
-                : "Nieaktywna";
+                ? messages.common.sessionStatus.active
+                : messages.common.sessionStatus.inactive;
 
     async function handleAddAccount(input: Parameters<typeof addAccount>[0]): Promise<void> {
         navigateTo("accounts");
