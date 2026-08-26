@@ -49,21 +49,7 @@ function checkStatus(item: Cheerio<Element>, spots: string): ClassStatus {
     const registration = item.find("div.registration");
     const text = registration.text().trim();
 
-    if (registration.find("a.minus").length > 0) {
-        return "booked";
-
-    }
-
-    const [bookedSpots, totalSpots] = spots.split("/").map(Number);
-    if (Number.isFinite(bookedSpots) && Number.isFinite(totalSpots) && bookedSpots === totalSpots) {
-        return "fully-booked";
-
-    }
-
     switch (text) {
-        case "Zapisz się":
-            return "available";
-
         case "Termin rejestracji minął":
             return "booking-closed";
 
@@ -72,10 +58,19 @@ function checkStatus(item: Cheerio<Element>, spots: string): ClassStatus {
 
         case "Za wcześnie by zarezerwować":
             return "too-early";
-
-        default:
-            return "unknown";
     }
+
+    if (registration.find("a.minus").length > 0)
+        return "booked";
+
+    const [bookedSpots, totalSpots] = spots.split("/").map(Number);
+    if (Number.isFinite(bookedSpots) && Number.isFinite(totalSpots) && bookedSpots === totalSpots)
+        return "fully-booked";
+
+    if (text === "Zapisz się")
+        return "available";
+
+    return "unknown";
 }
 
 function checkCanBook(spots: string, status: ClassStatus): boolean {
