@@ -1,0 +1,28 @@
+<svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="1150"
+        height="150"
+        viewBox="0 0 1150 150"
+        role="img"
+        aria-labelledby="title description"
+>
+    <title id="title">Zdrofit CLI</title>
+    <desc id="description">Napis Zdrofit CLI zapisany znakami w stylu terminalowym</desc>
+
+    <text
+            x="575"
+            y="25"
+            text-anchor="middle"
+            fill="#00C9D7"
+            font-family="Consolas, 'Courier New', monospace"
+            font-size="15"
+            xml:space="preserve"
+    >
+        <tspan x="575" dy="0">███████╗██████╗ ██████╗  ██████╗ ███████╗██╗████████╗     ██████╗██╗     ██╗</tspan>
+        <tspan x="575" dy="20">╚══███╔╝██╔══██╗██╔══██╗██╔═══██╗██╔════╝██║╚══██╔══╝    ██╔════╝██║     ██║</tspan>
+        <tspan x="575" dy="20">  ███╔╝ ██║  ██║██████╔╝██║   ██║█████╗  ██║   ██║       ██║     ██║     ██║</tspan>
+        <tspan x="575" dy="20"> ███╔╝  ██║  ██║██╔══██╗██║   ██║██╔══╝  ██║   ██║       ██║     ██║     ██║</tspan>
+        <tspan x="575" dy="20">███████╗██████╔╝██║  ██║╚██████╔╝██║     ██║   ██║       ╚██████╗███████╗██║</tspan>
+        <tspan x="575" dy="20">╚══════╝╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝   ╚═╝        ╚═════╝╚══════╝╚═╝</tspan>
+    </text>
+</svg>
