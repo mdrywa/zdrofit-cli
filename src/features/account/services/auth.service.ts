@@ -1,9 +1,9 @@
-import {secrets} from "bun";
 import type {Account} from "../account.types.ts";
 import {
     checkSessionInBrowser,
     loginInBrowser,
-} from "../../../infrastructure/playwright/playwright-worker.service.ts";
+} from "../../../infrastructure/playwright/playwright.service.ts";
+import {secretStore} from "../../../infrastructure/security/secret-store.ts";
 
 const SERVICE_NAME = "com.zdrofit.cli";
 
@@ -63,47 +63,25 @@ export async function logout(accountId: string): Promise<void> {
 }
 
 export async function getSessionId(accountId: string): Promise<string | null> {
-    return await secrets.get({
-        service: SERVICE_NAME,
-        name: getSessionSecretName(accountId),
-    });
+    return await secretStore.get(SERVICE_NAME, getSessionSecretName(accountId));
 }
 
-export async function saveSessionId(
-    accountId: string,
-    sessionId: string,
-): Promise<void> {
+export async function saveSessionId(accountId: string, sessionId: string): Promise<void> {
     const value = sessionId.trim();
 
     if (value.length === 0) {
         throw new Error("Session ID cannot be empty");
     }
 
-    await secrets.set({
-        service: SERVICE_NAME,
-        name: getSessionSecretName(accountId),
-        value,
-        allowUnrestrictedAccess: false,
-    });
+    await secretStore.set(SERVICE_NAME, getSessionSecretName(accountId), value);
 }
 
 export async function deleteSessionId(accountId: string): Promise<void> {
-    await secrets.delete({
-        service: SERVICE_NAME,
-        name: getSessionSecretName(accountId),
-    });
+    await secretStore.delete(SERVICE_NAME, getSessionSecretName(accountId));
 }
 
-export async function savePassword(
-    accountId: string,
-    password: string,
-): Promise<void> {
-    await secrets.set({
-        service: SERVICE_NAME,
-        name: getPasswordSecretName(accountId),
-        value: password,
-        allowUnrestrictedAccess: false,
-    });
+export async function savePassword(accountId: string, password: string): Promise<void> {
+    await secretStore.set(SERVICE_NAME, getPasswordSecretName(accountId), password);
 
     const savedPassword = await getPassword(accountId);
 
@@ -115,17 +93,11 @@ export async function savePassword(
 }
 
 export async function getPassword(accountId: string): Promise<string | null> {
-    return await secrets.get({
-        service: SERVICE_NAME,
-        name: getPasswordSecretName(accountId),
-    });
+    return await secretStore.get(SERVICE_NAME, getPasswordSecretName(accountId));
 }
 
 export async function deletePassword(accountId: string): Promise<void> {
-    await secrets.delete({
-        service: SERVICE_NAME,
-        name: getPasswordSecretName(accountId),
-    });
+    await secretStore.delete(SERVICE_NAME, getPasswordSecretName(accountId));
 }
 
 function getErrorMessage(error: unknown): string {
