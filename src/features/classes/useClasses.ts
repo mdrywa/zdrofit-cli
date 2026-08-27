@@ -4,6 +4,7 @@ import type {Club} from "../clubs/clubs.types.ts";
 import {fetchClasses, registerForClass, unregisterFromClass} from "./classes.service.ts";
 import type {Account} from "../account/account.types.ts";
 import {getClassUrl, getClubScheduler} from "../../zdrofit/zdrofit.urls.ts";
+import {useTranslations} from "../../i18n/useTranslations.ts";
 
 type UseClassesProps = {
     selectedClub: Club | undefined;
@@ -20,6 +21,8 @@ export function useClasses({
     addReservation,
     removeReservation,
 }: UseClassesProps) {
+    const {messages} = useTranslations();
+    const errors = messages.errors.classes;
     const [classes, setClasses] = useState<Class[]>([]);
     const [isClassesLoading, setIsClassesLoading] = useState<boolean>(true);
     const [classesError, setClassesError] = useState<string | null>(null);
@@ -41,13 +44,17 @@ export function useClasses({
                 setClassesError(null);
 
                 const clubScheduleUrl = getClubScheduler(selectedClub.href);
-                const loadedClasses = await fetchClasses(clubScheduleUrl, isSessionActive ? activeAccount : undefined);
+                const loadedClasses = await fetchClasses(
+                    clubScheduleUrl,
+                    isSessionActive ? activeAccount : undefined,
+                    errors,
+                );
                 setClasses(loadedClasses);
             }
             catch (error) {
                 setClassesError(error instanceof Error
                     ? error.message
-                    : "Nie udało się pobrać zajęć");
+                    : errors.loadFailed);
             }
             finally {
                 setIsClassesLoading(false);
@@ -55,21 +62,21 @@ export function useClasses({
         }
 
         void loadClasses();
-    }, [selectedClub?.id, activeAccount?.id, isSessionActive]);
+    }, [selectedClub?.id, activeAccount?.id, isSessionActive, errors]);
 
     async function toggleClassRegistration(classItem: Class): Promise<void> {
         if (!activeAccount) {
-            setClassesError("Brak aktywnego konta");
+            setClassesError(errors.noActiveAccount);
             return;
         }
 
         if (!selectedClub) {
-            setClassesError("Brak aktywnego klubu");
+            setClassesError(errors.noActiveClub);
             return;
         }
 
         if (classItem.status !== "available" && classItem.status !== "booked") {
-            setClassesError("Nie można wykonać tej akcji dla wybranych zajęć");
+            setClassesError(errors.actionUnavailable);
             return;
         }
 
@@ -89,7 +96,7 @@ export function useClasses({
             setClassesError(
                 error instanceof Error
                     ? error.message
-                    : "Nie udało się zmienić zapisu na zajęcia",
+                    : errors.updateFailed,
             );
         }
     }
@@ -97,14 +104,14 @@ export function useClasses({
     async function signUpForClass(classItem: Class, account: Account, club: Club): Promise<void> {
         const classUrl = getClassUrl(classItem.href);
 
-        await registerForClass(classUrl, classItem.id, account);
+        await registerForClass(classUrl, classItem.id, account, errors);
         await addReservation(account, club, classItem);
     }
 
     async function withdrawFromClass(classItem: Class, account: Account, club: Club): Promise<void> {
         const classUrl = getClassUrl(classItem.href);
 
-        await unregisterFromClass(classUrl, classItem.id, account);
+        await unregisterFromClass(classUrl, classItem.id, account, errors);
         await removeReservation(account, club, classItem);
     }
 
@@ -115,7 +122,7 @@ export function useClasses({
         }
 
         const clubScheduleUrl = getClubScheduler(selectedClub.href);
-        const updatedClasses = await fetchClasses(clubScheduleUrl, activeAccount);
+        const updatedClasses = await fetchClasses(clubScheduleUrl, activeAccount, errors);
         setClasses(updatedClasses);
     }
 

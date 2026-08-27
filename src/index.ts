@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import {startCli} from "./cli.tsx";
+import {errorMessages} from "./i18n/locales/en/errors.ts";
 
 async function main(): Promise<void> {
     try {
@@ -9,9 +10,9 @@ async function main(): Promise<void> {
         const message =
             error instanceof Error
                 ? error.message
-                : "An unexpected error occurred.";
+                : errorMessages.general.unexpected;
 
-        console.error(`Failed to start Zdrofit CLI: ${message}`);
+        console.error(errorMessages.general.startupFailed(message));
         process.exitCode = 1;
     }
 }

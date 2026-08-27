@@ -6,6 +6,8 @@ export type Language = typeof supportedLanguages[number];
 
 export type Messages = typeof en;
 
+export type ErrorMessages = Messages["errors"];
+
 export type I18nContextValue = {
     language: Language;
     messages: Messages;

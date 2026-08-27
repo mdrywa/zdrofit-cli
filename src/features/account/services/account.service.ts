@@ -2,6 +2,9 @@ import type {Account, AccountInput} from "../account.types.ts";
 import {getStoredAccounts, saveAccounts} from "../account.repository.ts";
 import {deletePassword, deleteSessionId, savePassword} from "./auth.service.ts";
 import { createHash } from "crypto";
+import type {ErrorMessages} from "../../../i18n/i18n.types.ts";
+
+type AccountErrorMessages = ErrorMessages["accounts"];
 
 
 export async function getAccounts(): Promise<Account[]> {
@@ -12,20 +15,23 @@ function createAccountId(email: string): string {
     return createHash("sha256").update(email).digest("hex");
 }
 
-export async function createAccount(input: AccountInput): Promise<Account> {
+export async function createAccount(
+    input: AccountInput,
+    errors: AccountErrorMessages,
+): Promise<Account> {
     const name = input.name.trim();
     const email = input.email.trim().toLowerCase();
 
     if (name.length === 0) {
-        throw new Error("Name cannot be empty");
+        throw new Error(errors.nameRequired);
     }
 
     if (email.length === 0) {
-        throw new Error("Email cannot be empty");
+        throw new Error(errors.emailRequired);
     }
 
     if (input.password.length === 0) {
-        throw new Error("Password cannot be empty");
+        throw new Error(errors.passwordRequired);
     }
 
     const accounts = await getStoredAccounts();
@@ -35,7 +41,7 @@ export async function createAccount(input: AccountInput): Promise<Account> {
     );
 
     if (accountAlreadyExists) {
-        throw new Error("Account already exists");
+        throw new Error(errors.alreadyExists);
     }
 
     const now = new Date().toISOString();
@@ -48,7 +54,7 @@ export async function createAccount(input: AccountInput): Promise<Account> {
         updatedAt: now,
     }
 
-    await savePassword(account.id, input.password);
+    await savePassword(account.id, input.password, errors);
 
     try {
         await saveAccounts([...accounts, account]);
@@ -68,13 +74,16 @@ export async function createAccount(input: AccountInput): Promise<Account> {
 }
 
 
-export async function deleteAccount(accountId: string): Promise<void> {
+export async function deleteAccount(
+    accountId: string,
+    errors: AccountErrorMessages,
+): Promise<void> {
     const accounts = await getStoredAccounts();
 
     const accountToDelete = accounts.find(account => account.id === accountId);
 
     if (!accountToDelete) {
-        throw new Error("Account does not exist");
+        throw new Error(errors.notFound);
     }
 
     const remainingAccounts = accounts.filter(account => account.id !== accountId);
@@ -90,12 +99,15 @@ export async function deleteAccount(accountId: string): Promise<void> {
     await saveAccounts(remainingAccounts);
 }
 
-export async function switchAccount(accountId: string): Promise<void> {
+export async function switchAccount(
+    accountId: string,
+    errors: AccountErrorMessages,
+): Promise<void> {
     const accounts = await getStoredAccounts();
     const accountExists = accounts.some(account => account.id === accountId);
 
     if (!accountExists) {
-        throw new Error("Account does not exist");
+        throw new Error(errors.notFound);
     }
 
     const now = new Date().toISOString();

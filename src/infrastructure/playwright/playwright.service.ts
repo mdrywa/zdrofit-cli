@@ -6,11 +6,22 @@ import {
     ZDROFIT_SESSION_COOKIE_NAME,
 } from "../../zdrofit/zdrofit.constants.ts";
 import {ZDROFIT_URLS} from "../../zdrofit/zdrofit.urls.ts";
+import type {ErrorMessages} from "../../i18n/i18n.types.ts";
+
+type BrowserErrorMessages = ErrorMessages["browser"];
+
+export class LoginCancelledError extends Error {
+    override readonly name = "LoginCancelledError";
+}
 
 const BROWSER_LAUNCH_TIMEOUT_MS = 30_000;
 const PAGE_LOAD_TIMEOUT_MS = 30_000;
 
-export async function loginInBrowser(email: string, password: string): Promise<string> {
+export async function loginInBrowser(
+    email: string,
+    password: string,
+    browserErrors: BrowserErrorMessages,
+): Promise<string> {
     const browser = await chromium.launch({
         headless: false,
         timeout: BROWSER_LAUNCH_TIMEOUT_MS,
@@ -32,11 +43,27 @@ export async function loginInBrowser(email: string, password: string): Promise<s
             timeout: PAGE_LOAD_TIMEOUT_MS,
         });
 
-        return await waitForSuccessfulLogin(context, page);
+        return await waitForSuccessfulLogin(context, page, browserErrors);
+    }
+    catch (error: unknown) {
+        if (isBrowserClosedError(error)) {
+            throw new LoginCancelledError(browserErrors.loginCancelled, {
+                cause: error,
+            });
+        }
+
+        throw error;
     }
     finally {
         await browser.close();
     }
+}
+
+function isBrowserClosedError(error: unknown): boolean {
+    return (
+        error instanceof Error &&
+        /Target (?:page, context or browser|page|context|browser) has been closed/i.test(error.message)
+    );
 }
 
 export async function checkSessionInBrowser(sessionId: string): Promise<boolean> {
@@ -78,7 +105,11 @@ export async function checkSessionInBrowser(sessionId: string): Promise<boolean>
     }
 }
 
-async function waitForSuccessfulLogin(context: BrowserContext, page: Page): Promise<string> {
+async function waitForSuccessfulLogin(
+    context: BrowserContext,
+    page: Page,
+    errors: BrowserErrorMessages,
+): Promise<string> {
     await page.waitForURL(
         url => !url.hash.includes("logowanie"),
         {
@@ -93,7 +124,7 @@ async function waitForSuccessfulLogin(context: BrowserContext, page: Page): Prom
 
     if (!sessionCookie?.value) {
         throw new Error(
-            `Po zalogowaniu nie znaleziono cookie ${ZDROFIT_SESSION_COOKIE_NAME}`,
+            errors.sessionCookieMissing(ZDROFIT_SESSION_COOKIE_NAME),
         );
     }
 

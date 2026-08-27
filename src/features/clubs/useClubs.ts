@@ -1,9 +1,12 @@
 import {useEffect, useState} from "react";
 import type {Club} from "./clubs.types.ts";
 import {fetchClubs, getActiveClub, saveActiveClub} from "./clubs.service.ts";
+import {useTranslations} from "../../i18n/useTranslations.ts";
 
 
 export function useClubs() {
+    const {messages} = useTranslations();
+    const errors = messages.errors.clubs;
     const [clubs, setClubs] = useState<Club[]>([]);
     const [activeClub, setActiveClub] = useState<Club>();
     const [isClubsLoading, setIsClubsLoading] = useState(true);
@@ -18,7 +21,7 @@ export function useClubs() {
                 const savedClub = await getActiveClub();
                 setActiveClub(savedClub);
 
-                const loadedClubs = await fetchClubs();
+                const loadedClubs = await fetchClubs(errors);
                 setClubs(loadedClubs);
 
                 if (savedClub) {
@@ -35,7 +38,7 @@ export function useClubs() {
             catch (error) {
                 setClubsError(error instanceof Error
                     ? error.message
-                    : "Nie udało się pobrać klubów");
+                    : errors.loadFailed);
             }
             finally {
                 setIsClubsLoading(false);
@@ -43,7 +46,7 @@ export function useClubs() {
         }
 
         void loadClubs();
-    }, [])
+    }, [errors])
 
 
     async function selectClub(club: Club): Promise<void> {

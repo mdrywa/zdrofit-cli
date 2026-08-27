@@ -4,8 +4,15 @@ import {getSessionId} from "../account/services/auth.service.ts";
 import {parseClasses} from "./classes.parser.ts";
 import * as cheerio from "cheerio";
 import {ZDROFIT_SESSION_COOKIE_NAME} from "../../zdrofit/zdrofit.constants.ts";
+import type {ErrorMessages} from "../../i18n/i18n.types.ts";
 
-export async function fetchClasses(clubScheduleUrl: string, account?: Account): Promise<Class[]> {
+type ClassErrorMessages = ErrorMessages["classes"];
+
+export async function fetchClasses(
+    clubScheduleUrl: string,
+    account: Account | undefined,
+    errors: ClassErrorMessages,
+): Promise<Class[]> {
     const headers: Record<string, string> = {};
 
     const sessionId = account ? await getSessionId(account.id) : null;
@@ -18,7 +25,7 @@ export async function fetchClasses(clubScheduleUrl: string, account?: Account): 
     });
 
     if (!response.ok) {
-        throw new Error(`Nie udało się pobrać zajęć: HTTP ${response.status}`);
+        throw new Error(errors.requestFailed(response.status));
     }
 
     const html = await response.text();
@@ -27,18 +34,23 @@ export async function fetchClasses(clubScheduleUrl: string, account?: Account): 
 }
 
 
-export async function registerForClass(classHref: string, classId: string, account: Account): Promise<void> {
+export async function registerForClass(
+    classHref: string,
+    classId: string,
+    account: Account,
+    errors: ClassErrorMessages,
+): Promise<void> {
     const sessionId = await getSessionId(account.id);
 
     if (!sessionId) {
-        throw new Error("Brak aktywnej sesji");
+        throw new Error(errors.activeSessionRequired);
     }
 
     const headers = {
         Cookie: `${ZDROFIT_SESSION_COOKIE_NAME}=${sessionId}`,
     }
 
-    const token = await getClassRegistrationFormToken(classHref, headers);
+    const token = await getClassRegistrationFormToken(classHref, headers, errors);
 
     const body = new URLSearchParams({
         "schedule_register_form[id]": classId,
@@ -56,16 +68,20 @@ export async function registerForClass(classHref: string, classId: string, accou
     });
 
     if (!registrationResponse.ok) {
-        throw new Error(`Rejestracja na zajęcia nie powiodła się: ${registrationResponse.status}`);
+        throw new Error(errors.bookingFailed(registrationResponse.status));
     }
 }
 
 
-async function getClassRegistrationFormToken(classHref: string, headers: {}): Promise<string> {
+async function getClassRegistrationFormToken(
+    classHref: string,
+    headers: {},
+    errors: ClassErrorMessages,
+): Promise<string> {
     const response = await fetch(classHref, {headers});
 
     if (!response.ok) {
-        throw new Error(`Nie udało się pobrać formulkarza rezerwacji`);
+        throw new Error(errors.bookingFormFailed);
     }
 
     const html = await response.text();
@@ -74,25 +90,30 @@ async function getClassRegistrationFormToken(classHref: string, headers: {}): Pr
     const token = $('input[name="schedule_register_form[_token]"]').attr("value")?.trim();
 
     if (!token) {
-        throw new Error("Nie znaleziono tokenu rezerwacji");
+        throw new Error(errors.bookingTokenMissing);
     }
 
     return token;
 }
 
 
-export async function unregisterFromClass(classHref: string, classId: string, account: Account): Promise<void> {
+export async function unregisterFromClass(
+    classHref: string,
+    classId: string,
+    account: Account,
+    errors: ClassErrorMessages,
+): Promise<void> {
     const sessionId = await getSessionId(account.id);
 
     if (!sessionId) {
-        throw new Error("Brak aktywnej sesji");
+        throw new Error(errors.activeSessionRequired);
     }
 
     const headers = {
         Cookie: `${ZDROFIT_SESSION_COOKIE_NAME}=${sessionId}`,
     }
 
-    const token = await getClassUnregistrationFormToken(classHref, headers);
+    const token = await getClassUnregistrationFormToken(classHref, headers, errors);
 
     const body = new URLSearchParams({
         "schedule_unregister_form[id]": classId,
@@ -110,16 +131,20 @@ export async function unregisterFromClass(classHref: string, classId: string, ac
     });
 
     if (!unregistrationResponse.ok) {
-        throw new Error(`Wypisanie z zajęć nie powiodło się: ${unregistrationResponse.status}`);
+        throw new Error(errors.cancellationFailed(unregistrationResponse.status));
     }
 }
 
 
-async function getClassUnregistrationFormToken(classHref: string, headers: {}): Promise<string> {
+async function getClassUnregistrationFormToken(
+    classHref: string,
+    headers: {},
+    errors: ClassErrorMessages,
+): Promise<string> {
     const response = await fetch(classHref, {headers});
 
     if (!response.ok) {
-        throw new Error(`Nie udało się pobrać formularza anulowania rezerwacji`);
+        throw new Error(errors.cancellationFormFailed);
     }
 
     const html = await response.text();
@@ -128,7 +153,7 @@ async function getClassUnregistrationFormToken(classHref: string, headers: {}): 
     const token = $('input[name="schedule_unregister_form[_token]"]').attr("value")?.trim();
 
     if (!token) {
-        throw new Error("Nie znaleziono tokenu anulowania rezerwacji");
+        throw new Error(errors.cancellationTokenMissing);
     }
 
     return token;

@@ -9,11 +9,15 @@ import {
 } from "./reservations.service.ts";
 import type {Club} from "../clubs/clubs.types.ts";
 import type {Class} from "../classes/classes.types.ts";
+import {useTranslations} from "../../i18n/useTranslations.ts";
 
 export function useReservations(
     activeAccount: Account | undefined,
     isSessionActive: boolean,
 ) {
+    const {messages} = useTranslations();
+    const errors = messages.errors.reservations;
+    const classErrors = messages.errors.classes;
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [reservationsLoading, setReservationsLoading] = useState(true);
     const [reservationsError, setReservationsError] = useState<string | null>(null);
@@ -43,7 +47,7 @@ export function useReservations(
 
                 if (isSessionActive) {
                     const synchronizedReservations =
-                        await synchronizeSavedReservations(activeAccount);
+                        await synchronizeSavedReservations(activeAccount, classErrors);
 
                     if (!cancelled) {
                         setReservations(synchronizedReservations);
@@ -54,7 +58,7 @@ export function useReservations(
                 if (!cancelled) {
                     setReservationsError(error instanceof Error
                         ? error.message
-                        : "Nie udało się pobrać rezerwacji");
+                        : errors.loadFailed);
                 }
             }
             finally {
@@ -69,7 +73,7 @@ export function useReservations(
         return () => {
             cancelled = true;
         };
-    }, [activeAccount?.id, isSessionActive]);
+    }, [activeAccount?.id, isSessionActive, errors, classErrors]);
 
     async function addReservation(account: Account, club: Club, classItem: Class): Promise<void> {
         setReservationsError(null);
@@ -83,7 +87,7 @@ export function useReservations(
         catch (error: unknown) {
             setReservationsError(getErrorMessage(
                 error,
-                "Nie udało się utworzyć rezerwacji",
+                errors.createFailed,
             ));
             throw error;
         }
@@ -101,7 +105,7 @@ export function useReservations(
         catch (error: unknown) {
             setReservationsError(getErrorMessage(
                 error,
-                "Nie udało się usunąć rezerwacji",
+                errors.removeFailed,
             ));
             throw error;
         }
@@ -123,7 +127,7 @@ export function useReservations(
         setReservationsError(
             error instanceof Error
                 ? error.message
-                : "Nie udało się wykonać operacji na rezerwacji"
+                : errors.operationFailed
         );
     }
 

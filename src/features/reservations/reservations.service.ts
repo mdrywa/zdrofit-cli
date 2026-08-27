@@ -5,6 +5,9 @@ import type {Club} from "../clubs/clubs.types.ts";
 import {getClubScheduler} from "../../zdrofit/zdrofit.urls.ts";
 import {fetchClasses} from "../classes/classes.service.ts";
 import type {Class} from "../classes/classes.types.ts";
+import type {ErrorMessages} from "../../i18n/i18n.types.ts";
+
+type ClassErrorMessages = ErrorMessages["classes"];
 
 type ClubReservations = {
     club: Club;
@@ -71,7 +74,11 @@ function mapReservationsByClub(reservations: Reservation[]): Map<string, ClubRes
     return reservationsByClub;
 }
 
-async function syncReservations(reservations: Reservation[], account: Account): Promise<Reservation[]> {
+async function syncReservations(
+    reservations: Reservation[],
+    account: Account,
+    errors: ClassErrorMessages,
+): Promise<Reservation[]> {
     if (reservations.length === 0) {
         return [];
     }
@@ -81,7 +88,7 @@ async function syncReservations(reservations: Reservation[], account: Account): 
     const synchronizedGroups = await Promise.all(
         [...reservationsByClub.values()].map(async ({club, reservations}) => {
             const clubSchedulerHref = getClubScheduler(club.href);
-            const classes = await fetchClasses(clubSchedulerHref, account);
+            const classes = await fetchClasses(clubSchedulerHref, account, errors);
 
             const reservedClassIds = new Set(
                 classes
@@ -101,7 +108,10 @@ async function syncReservations(reservations: Reservation[], account: Account): 
     return synchronizedGroups.flat();
 }
 
-export async function synchronizeSavedReservations(account: Account): Promise<Reservation[]> {
+export async function synchronizeSavedReservations(
+    account: Account,
+    errors: ClassErrorMessages,
+): Promise<Reservation[]> {
     const allReservations = await getSavedReservations();
 
     const accountReservations = allReservations.filter(
@@ -114,6 +124,7 @@ export async function synchronizeSavedReservations(account: Account): Promise<Re
     const synchronizedReservations = await syncReservations(
         accountReservations,
         account,
+        errors,
     );
 
     await saveReservations([

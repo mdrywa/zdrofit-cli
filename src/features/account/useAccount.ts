@@ -6,9 +6,13 @@ import {
     switchAccount as switchAccountService,
 } from "./services/account.service.ts";
 import {checkSession, login} from "./services/auth.service.ts";
+import {useTranslations} from "../../i18n/useTranslations.ts";
 
 
 export function useAccount() {
+    const {messages} = useTranslations();
+    const errors = messages.errors.accounts;
+    const browserErrors = messages.errors.browser;
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isCheckingSession, setIsCheckingSession] = useState(true);
@@ -33,10 +37,10 @@ export function useAccount() {
                     return;
                 }
 
-                setIsSessionActive(await checkSession(savedActiveAccount));
+                setIsSessionActive(await checkSession(savedActiveAccount, errors));
             }
             catch (error) {
-                setError(getErrorMessage(error));
+                setError(getErrorMessage(error, errors.unexpected));
                 setIsSessionActive(false);
             }
             finally {
@@ -46,13 +50,13 @@ export function useAccount() {
         }
 
         void loadAccounts();
-    }, []);
+    }, [errors]);
 
     async function addAccount(input: AccountInput): Promise<Account> {
         setError(null);
 
         try {
-            const account = await createAccount(input);
+            const account = await createAccount(input, errors);
 
             const savedAccounts = await getAccounts();
 
@@ -61,7 +65,7 @@ export function useAccount() {
             return account;
         }
         catch (error: unknown) {
-            setError(getErrorMessage(error));
+            setError(getErrorMessage(error, errors.unexpected));
             throw error;
         }
     }
@@ -70,14 +74,14 @@ export function useAccount() {
         setError(null);
 
         try {
-            await deleteAccountService(accountId);
+            await deleteAccountService(accountId, errors);
 
             const savedAccounts = await getAccounts();
 
             setAccounts(savedAccounts);
         }
         catch (error: unknown) {
-            setError(getErrorMessage(error));
+            setError(getErrorMessage(error, errors.unexpected));
             throw error;
         }
     }
@@ -88,7 +92,7 @@ export function useAccount() {
         setIsSessionActive(null);
 
         try {
-            await switchAccountService(accountId);
+            await switchAccountService(accountId, errors);
 
             const savedAccounts = await getAccounts();
             const switchedAccount = savedAccounts.find(
@@ -98,13 +102,13 @@ export function useAccount() {
             setAccounts(savedAccounts);
 
             if (!switchedAccount) {
-                throw new Error("Account does not exist");
+                throw new Error(errors.notFound);
             }
 
-            setIsSessionActive(await checkSession(switchedAccount));
+            setIsSessionActive(await checkSession(switchedAccount, errors));
         }
         catch (error: unknown) {
-            setError(getErrorMessage(error));
+            setError(getErrorMessage(error, errors.unexpected));
             setIsSessionActive(false);
             throw error;
         }
@@ -122,19 +126,19 @@ export function useAccount() {
         setIsRefreshingSession(true);
 
         if (!activeAccount) {
-            setError("No active account found");
+            setError(errors.noActiveAccount);
             setIsRefreshingSession(false);
             return false;
         }
 
         try {
-            await login(activeAccount);
+            await login(activeAccount, errors, browserErrors);
             setIsSessionActive(true);
 
             return true;
         }
         catch (error: unknown) {
-            setError(getErrorMessage(error));
+            setError(getErrorMessage(error, errors.unexpected));
             setIsSessionActive(false);
             return false;
         }
@@ -163,10 +167,10 @@ export function useAccount() {
     };
 }
 
-function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
     if (error instanceof Error) {
         return error.message;
     }
 
-    return "Unexpected account error";
+    return fallbackMessage;
 }

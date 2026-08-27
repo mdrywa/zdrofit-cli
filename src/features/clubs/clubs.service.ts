@@ -2,6 +2,9 @@ import type {Club} from "./clubs.types.ts";
 import * as cheerio from "cheerio";
 import {ZDROFIT_URLS} from "../../zdrofit/zdrofit.urls.ts";
 import {getStoredActiveClub, setActiveClub} from "./clubs.repository.ts";
+import type {ErrorMessages} from "../../i18n/i18n.types.ts";
+
+type ClubErrorMessages = ErrorMessages["clubs"];
 
 
 export async function getActiveClub(): Promise<Club | undefined> {
@@ -12,11 +15,11 @@ export async function saveActiveClub(club: Club): Promise<void> {
     await setActiveClub(club);
 }
 
-export async function fetchClubs(): Promise<Club[]> {
+export async function fetchClubs(errors: ClubErrorMessages): Promise<Club[]> {
     const response = await fetch(ZDROFIT_URLS.clubs);
 
     if (!response.ok) {
-        throw new Error(`Nie udało się pobrać klubów: HTTP ${response.status}`);
+        throw new Error(errors.requestFailed(response.status));
     }
 
     const html = await response.text();
