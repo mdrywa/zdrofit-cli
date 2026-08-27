@@ -101,11 +101,11 @@ export function MainMenuScreen({
                     label: text.scheduledReservations,
                     onSelect: onReservationsClick,
                 },
-                {
-                    id: "settings",
-                    label: text.settings,
-                    onSelect: () => console.log(text.settings),
-                },
+                // {
+                //     id: "settings",
+                //     label: text.settings,
+                //     onSelect: () => console.log(text.settings),
+                // },
             ]}
             />
 
