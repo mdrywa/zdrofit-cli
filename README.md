@@ -20,10 +20,78 @@ It provides a fast, keyboard-driven interface for checking class schedules,
 managing reservations and working with multiple accounts without using
 the Zdrofit website manually.
 
-
 ## Preview
 
+<table>
+  <tr>
+    <td width="50%">
+      <img
+        src="assets/accounts-screen.gif"
+        alt="Account Management"
+        width="100%"
+      >
+    </td>
+    <td width="50%">
+      <h3>1. Account Management</h3>
+      <p>
+        Add and manage multiple Zdrofit accounts directly from the terminal.
+        Saved sessions are restored automatically, so you do not need to
+        authenticate every time the application starts.
+      </p>
+    </td>
+  </tr>
 
+  <tr>
+    <td width="50%">
+      <h3>2. Club Selection</h3>
+      <p>
+        Browse available Zdrofit clubs, switch between locations and choose
+        the club whose schedule you want to explore.
+      </p>
+    </td>
+    <td width="50%">
+      <img
+        src="assets/clubs-screen.gif"
+        alt="Club Selection"
+        width="100%"
+      >
+    </td>
+  </tr>
+
+  <tr>
+    <td width="50%">
+      <img
+        src="assets/classes-screen.gif"
+        alt="Class Browser"
+        width="100%"
+      >
+    </td>
+    <td width="50%">
+      <h3>3. Browse Classes</h3>
+      <p>
+        Navigate the schedule by date, check class availability and browse
+        upcoming sessions without leaving the terminal.
+      </p>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="50%">
+      <h3>4. Manage Reservations</h3>
+      <p>
+        View your current reservations, keep them synchronized with Zdrofit
+        and cancel booked classes directly from the CLI.
+      </p>
+    </td>
+    <td width="50%">
+      <img
+        src="assets/reservations-screen.gif"
+        alt="Reservation Management"
+        width="100%"
+      >
+    </td>
+  </tr>
+</table>
 
 ## Quick Start
 
@@ -97,6 +165,6 @@ with, endorsed by or associated with Zdrofit or Benefit Systems S.A.
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
 
 
