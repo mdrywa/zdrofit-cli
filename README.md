@@ -98,11 +98,11 @@ the Zdrofit website manually.
 Requires **Node.js 22+** and an active Zdrofit account.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/zdrofit-cli.git
-cd zdrofit-cli
-npm install
-npm start
+npm install --global zdrofit-cli
+zdrofit
 ```
+
+The first installation downloads the Chromium browser used for authentication.
 
 ## Features
 
@@ -156,6 +156,17 @@ src/
 ├── infrastructure/
 ├── constants/
 └── index.ts
+```
+
+## Development
+
+```bash
+git clone https://github.com/1maciek90/zdrofit-cli.git
+cd zdrofit-cli
+npm install
+npm run typecheck
+npm run build
+npm start
 ```
 
 ## Disclaimer

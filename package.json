@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "description": "Interactive terminal client for browsing and booking Zdrofit classes.",
   "type": "module",
-  "private": true,
   "bin": {
-    "zdrofit": "./dist/index.js"
+    "zdrofit": "dist/index.js"
   },
   "scripts": {
     "clean": "rimraf dist",
