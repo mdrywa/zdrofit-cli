@@ -161,7 +161,7 @@ src/
 ## Development
 
 ```bash
-git clone https://github.com/1maciek90/zdrofit-cli.git
+git clone https://github.com/mdrywa/zdrofit-cli.git
 cd zdrofit-cli
 npm install
 npm run typecheck
