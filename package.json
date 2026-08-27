@@ -21,6 +21,20 @@
   "engines": {
     "node": ">=22"
   },
+  "keywords": [
+    "zdrofit",
+    "cli",
+    "tui",
+    "fitness",
+    "gym",
+    "booking",
+    "class-booking",
+    "auto-booking",
+    "reservation",
+    "terminal",
+    "ink",
+    "playwright"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
