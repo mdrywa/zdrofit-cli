@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import {startCli} from "./cli.tsx";
 
 async function main(): Promise<void> {
