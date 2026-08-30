@@ -161,7 +161,7 @@ src/
 ## Development
 
 ```bash
-git clone https://github.com/mdrywa/zdrofit-cli.git
+git clone https://github.com/maciejdrywa/zdrofit-cli.git
 cd zdrofit-cli
 npm install
 npm run typecheck
@@ -177,5 +177,4 @@ with, endorsed by or associated with Zdrofit or Benefit Systems S.A.
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
 
